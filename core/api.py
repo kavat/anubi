@@ -1,0 +1,58 @@
+import config
+import time
+
+from flask import Flask
+from flask import request
+
+app = Flask(__name__)
+
+@app.route("/", methods=['GET'])
+def index():
+  if request.method == 'GET':
+    if request.args.get('func'):
+      if request.args.get('func') == 'help':
+        return "refresh_yara|refresh_hash|refresh_ip"
+      if request.args.get('func') == 'refresh_yara':
+        if config.yara_scan.get() == True:
+          return "Non aggiorno per scansione in corso"
+        else:
+          config.updater_yara.set_updating(True)
+          config.scanners['yara_scanner'].load_rules()
+          config.updater_yara.set_updating(False)
+          return "ok"
+      if request.args.get('func') == 'refresh_hash':
+        if config.hash_scan.get() == True:
+          return "Non aggiorno per scansione in corso"
+        else:
+          config.updater_hash.set_updating(True)
+          config.scanners['hash_scanner'].load_rules()
+          config.updater_hash.set_updating(False)
+          return "ok"
+      if request.args.get('func') == 'refresh_ip':
+        if config.ip_check.get() == True:
+          return "Non aggiorno per analisi pacchetto in corso"
+        else:
+          config.updater_ip.set_updating(True)
+          config.scanners['ip_checker'].load_rules()
+          config.updater_ip.set_updating(False)
+          return "ok"
+    else:
+      return "no_func_arg"
+  else:
+    return "no_get_method"
+
+def start_api(host, port):
+  try:
+    config.loggers["resources"]["logger_anubi_management"].get_logger().info("Starting API..")
+    app.run(host, port)
+  except Exception as e:
+    config.loggers["resources"]["logger_anubi_main"].get_logger().critical(e, exc_info=True)
+    config.loggers["resources"]["logger_anubi_management"].get_logger().critical(e, exc_info=True)
+    if check_tcp_conn(host, port) == False: 
+      config.loggers["resources"]["logger_anubi_management"].get_logger().critical("Tra " + str(config.sleep_thread_restart) + " riavvio il thread")
+      config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("api() BOOM!!!")
+      time.sleep(config.sleep_thread_socket_restart)
+      config.loggers["resources"]["logger_anubi_management"].get_logger().critical("Riavvio thread")
+      start_api(host, port)
+    else:
+      config.loggers["resources"]["logger_anubi_management"].get_logger().info("Server raggiungibile, riavvio del thread non necessario")
