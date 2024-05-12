@@ -28,25 +28,37 @@ class IpChecker:
   ip_tables = {}
 
   def __init__(self):
-    if os.path.isdir(config.ip_path) == False:
+    if os.path.isdir(config.ip_path) == False and os.path.isdir(config.custom_ip_path):
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("{} not found, exit".format(config.ip_path))
       sys.exit(1)
     #pull_rules_repo('ip')
     self.load_rules()
 
   def load_rules(self):
-    self.ip_tables = {}
-    for file_ip in os.listdir(config.ip_path):
-      full_path_ip = "{}/{}".format(config.ip_path, file_ip)
-      try:
-        with open(full_path_ip) as f:
-          for line in f:
-            self.ip_tables[line.rstrip()] = 1
-        config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Loaded {}".format(full_path_ip))
-      except Exception as e:
-        config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
-        config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
-        config.loggers["resources"]["logger_anubi_ip"].get_logger().warning("Skipped {}".format(full_path_ip))
+    if os.path.isdir(config.ip_path) == False:
+      for file_ip in os.listdir(config.ip_path):
+        full_path_ip = "{}/{}".format(config.ip_path, file_ip)
+        try:
+          with open(full_path_ip) as f:
+            for line in f:
+              self.ip_tables[line.rstrip()] = 1
+          config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Loaded {}".format(full_path_ip))
+        except Exception as e:
+          config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_ip"].get_logger().warning("Skipped {}".format(full_path_ip))
+    if os.path.isdir(config.custom_ip_path) == False:
+      for file_ip in os.listdir(config.custom_ip_path):
+        full_path_ip = "{}/{}".format(config.custom_ip_path, file_ip)
+        try:
+          with open(full_path_ip) as f:
+            for line in f:
+              self.ip_tables[line.rstrip()] = 1
+          config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Loaded {}".format(full_path_ip))
+        except Exception as e:
+          config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_ip"].get_logger().warning("Skipped {}".format(full_path_ip))
 
   def sniff(self, interface):
     try:

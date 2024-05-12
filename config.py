@@ -30,6 +30,9 @@ conf_path = "{}/conf".format(application_path)
 rule_path = "{}/conf/anubi-signatures/yara".format(application_path)
 hash_path = "{}/conf/anubi-signatures/hash".format(application_path)
 ip_path = "{}/conf/anubi-signatures/ips".format(application_path)
+custom_rule_path = "{}/conf/custom_rules".format(application_path)
+custom_hash_path = "{}/conf/custom_hash".format(application_path)
+custom_ip_path = "{}/conf/custom_ip".format(application_path)
 configfile_path = "{}/conf/runtime.dat".format(application_path)
 
 log_to_stdout = True
