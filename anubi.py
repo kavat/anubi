@@ -40,6 +40,7 @@ parser = ArgumentParser(
                     description='List of Anubi command line options')
 
 parser.add_argument('--check-conf', action='store_true', help='Check current configuration')
+parser.add_argument('--check-struct', action='store_true', help='Check Anubi directory structure') 
 parser.add_argument('--init', action='store_true', help='Init configuration')
 parser.add_argument('--start', action='store_true', help='Start Anubi with configuration created')
 parser.add_argument('--wipe', action='store_true', help='Wipe Anubi logs')
@@ -50,7 +51,15 @@ if args.init == True:
   sys.exit(1)
 
 if args.check_conf == True:
-  print(get_anubi_conf())
+  print(get_anubi_conf('desc'))
+  sys.exit(1)
+
+if args.check_struct == True:
+  for dir in config.anubi_path:
+    if os.path.isdir(config.anubi_path[dir]) == True:
+      print("{} in path {} exists".format(dir, config.anubi_path[dir]))
+    else:
+      print("{} in path {} not exists".format(dir, config.anubi_path[dir]))    
   sys.exit(1)
 
 if args.wipe == True:
@@ -60,11 +69,11 @@ if args.wipe == True:
 
 if args.start == True:
 
-  if os.path.isfile(config.configfile_path) == False:
+  if os.path.isfile(config.anubi_path['configfile_path']) == False:
     first_setup()
 
   init_rules_repo('main')
-  config.conf_anubi = get_anubi_conf()
+  config.conf_anubi = get_anubi_conf('list')
 
   try:
 

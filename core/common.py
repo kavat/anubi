@@ -54,7 +54,7 @@ def file_exclusions(file_path):
   for exclusion in config.linux_dir_exclusions:
     if file_path.startswith(exclusion) == True:
       return True
-  if file_path.startswith(config.application_path):
+  if file_path.startswith(config.anubi_path['application_path']):
     return True
   file_extension = re.search('\.[^\/\.]+$', file_path)
   if file_extension:
@@ -88,7 +88,7 @@ def check_string_time(string):
 def first_setup():
   print("Welcome to the first setup for Anubi!")
   try:
-    f = open(config.configfile_path, "w")
+    f = open(config.anubi_path['configfile_path'], "w")
     print("Enter the answers for the following questions in order to build your configuration")
     loop_until_input("Do you want start? (Y/N) ", ['Y','N'])
     ioc_ = loop_until_input("Do you want enable daily passive IOC detection? (Y/N) ", ['Y','N'])
@@ -118,29 +118,35 @@ def first_setup():
   except Exception as e:
     return False
 
-def get_anubi_conf():
+def get_anubi_conf(type_output):
   c = {}
   try:
-    with open(config.configfile_path) as f:
+    with open(config.anubi_path['configfile_path']) as f:
       for line in f:
         c[line.rstrip().split("=")[0]] = line.rstrip().split("=")[1]
-    config.loggers["resources"]["logger_anubi_main"].get_logger().info("Loaded {}".format(config.configfile_path))
+    config.loggers["resources"]["logger_anubi_main"].get_logger().info("Loaded {}".format(config.anubi_path['configfile_path']))
   except Exception as e:
     traceback.print_exc()
     print(e)
-    config.loggers["resources"]["logger_anubi_main"].get_logger().critical("Error during {} loading".format(config.configfile_path))
-  return c
+    config.loggers["resources"]["logger_anubi_main"].get_logger().critical("Error during {} loading".format(config.anubi_path['configfile_path']))
+  if type_output == 'list':
+    return c
+  else:
+    s = ""
+    for field in c:
+      s = "{}{} = {}\n".format(s, field, c[field])
+    return s
 
 def init_rules_repo(thread_name):
   config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Init rules repo")
-  p = subprocess.Popen("cd {} && rm -rf anubi-signatures && git clone https://github.com/kavat/anubi-signatures".format(config.conf_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  p = subprocess.Popen("cd {} && rm -rf anubi-signatures && git clone https://github.com/kavat/anubi-signatures".format(config.anubi_path['conf_path']), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
   for line in p.stdout.readlines():
     config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Clone rules repo stdout: {}".format(line.decode('ascii').rstrip()))
   config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Clone rules repo exit_status: {}".format(p.wait()))
 
 def pull_rules_repo(thread_name):
   config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Init pull rules repo")
-  p = subprocess.Popen("cd {} && git pull".format(config.rule_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  p = subprocess.Popen("cd {} && git pull".format(config.anubi_path['rule_path']), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
   for line in p.stdout.readlines():
     config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Update rules repo stdout: {}".format(line.decode('ascii').rstrip()))
   config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Update rules repo exit_status: {}".format(p.wait()))

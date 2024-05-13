@@ -28,16 +28,16 @@ class IpChecker:
   ip_tables = {}
 
   def __init__(self):
-    if os.path.isdir(config.ip_path) == False and os.path.isdir(config.custom_ip_path):
-      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("{} not found, exit".format(config.ip_path))
+    if os.path.isdir(config.anubi_path['ip_path']) == False and os.path.isdir(config.anubi_path['custom_ip_path']):
+      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("{} not found, exit".format(config.anubi_path['ip_path']))
       sys.exit(1)
     #pull_rules_repo('ip')
     self.load_rules()
 
   def load_rules(self):
-    if os.path.isdir(config.ip_path) == False:
-      for file_ip in os.listdir(config.ip_path):
-        full_path_ip = "{}/{}".format(config.ip_path, file_ip)
+    if os.path.isdir(config.anubi_path['ip_path']) == False:
+      for file_ip in os.listdir(config.anubi_path['ip_path']):
+        full_path_ip = "{}/{}".format(config.anubi_path['ip_path'], file_ip)
         try:
           with open(full_path_ip) as f:
             for line in f:
@@ -47,9 +47,9 @@ class IpChecker:
           config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
           config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
           config.loggers["resources"]["logger_anubi_ip"].get_logger().warning("Skipped {}".format(full_path_ip))
-    if os.path.isdir(config.custom_ip_path) == False:
-      for file_ip in os.listdir(config.custom_ip_path):
-        full_path_ip = "{}/{}".format(config.custom_ip_path, file_ip)
+    if os.path.isdir(config.anubi_path['custom_ip_path']) == False:
+      for file_ip in os.listdir(config.anubi_path['custom_ip_path']):
+        full_path_ip = "{}/{}".format(config.anubi_path['custom_ip_path'], file_ip)
         try:
           with open(full_path_ip) as f:
             for line in f:

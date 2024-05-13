@@ -29,16 +29,16 @@ class HashScanner:
   hash_tables = {}
 
   def __init__(self):
-    if os.path.isdir(config.hash_path) == False and os.path.isdir(config.custom_hash_path) == False:
-      config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("{} not found, exit".format(config.hash_path))
+    if os.path.isdir(config.anubi_path['hash_path']) == False and os.path.isdir(config.anubi_path['custom_hash_path']) == False:
+      config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("{} not found, exit".format(config.anubi_path['hash_path']))
       sys.exit(1)
     #pull_rules_repo('hash')
     self.load_rules()
 
   def load_rules(self):
-    if os.path.isdir(config.hash_path) == False:
-      for file_hash in os.listdir(config.hash_path):
-        full_path_hash = "{}/{}".format(config.hash_path, file_hash)
+    if os.path.isdir(config.anubi_path['hash_path']) == False:
+      for file_hash in os.listdir(config.anubi_path['hash_path']):
+        full_path_hash = "{}/{}".format(config.anubi_path['hash_path'], file_hash)
         try:
           with open(full_path_hash) as f:
             for line in f:
@@ -48,9 +48,9 @@ class HashScanner:
           config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
           config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
           config.loggers["resources"]["logger_anubi_hash"].get_logger().warning("Skipped {}".format(full_path_hash))
-    if os.path.isdir(config.custom_hash_path) == False:
-      for file_hash in os.listdir(config.custom_hash_path):
-        full_path_hash = "{}/{}".format(config.custom_hash_path, file_hash)
+    if os.path.isdir(config.anubi_path['custom_hash_path']) == False:
+      for file_hash in os.listdir(config.anubi_path['custom_hash_path']):
+        full_path_hash = "{}/{}".format(config.anubi_path['custom_hash_path'], file_hash)
         try:
           with open(full_path_hash) as f:
             for line in f:
