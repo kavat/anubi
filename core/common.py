@@ -6,6 +6,7 @@ import os
 import hashlib
 import re
 import subprocess
+import psutil
 
 from sys import platform as _platform
 from datetime import datetime
@@ -54,7 +55,7 @@ def file_exclusions(file_path):
   for exclusion in config.linux_dir_exclusions:
     if file_path.startswith(exclusion) == True:
       return True
-  if file_path.startswith(config.anubi_path['application_path']):
+  if file_path.startswith(config.application_path):
     return True
   file_extension = re.search('\.[^\/\.]+$', file_path)
   if file_extension:
@@ -104,7 +105,11 @@ def first_setup():
     ip_ = loop_until_input("Do you want enable suspicious network traffic detection? (Y/N) ", ['Y','N'])
     f.write("ip={}\n".format(ip_))
     if ip_ == "Y": 
-      ens_ = loop_until_input("Set the interface to be monitored: [eth_id] ", r'^[a-zA-Z0-9]+$')
+      addrs = psutil.net_if_addrs()
+      list_ens = []
+      for ens__ in addrs.keys():
+        list_ens.append(ens__)
+      ens_ = loop_until_input("Set the interface to be monitored: [{}] ".format(','.join(list_ens)), list_ens)
       f.write("eth={}\n".format(ens_))
     live_ = loop_until_input("Do you want enable live directory scan? (Y/N) ", ['Y','N'])
     f.write("live={}\n".format(live_))

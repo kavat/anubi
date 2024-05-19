@@ -5,6 +5,7 @@ import time
 import pathlib
 import re
 import subprocess
+import sys
 
 from core.common import (
   wait_for_updating,
@@ -36,7 +37,7 @@ class YaraScanner:
 
   def load_rules(self):
     rules = {}
-    if os.path.isdir(config.anubi_path['rule_path']) == False:
+    if os.path.isdir(config.anubi_path['rule_path']) == True:
       for file_rule in os.listdir(config.anubi_path['rule_path']):
         full_path_rule = "{}/{}".format(config.anubi_path['rule_path'], file_rule)
         try:
@@ -47,7 +48,7 @@ class YaraScanner:
           config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
           config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
           config.loggers["resources"]["logger_anubi_yara"].get_logger().warning("Skipped {}".format(full_path_rule))
-    if os.path.isdir(config.anubi_path['custom_rule_path']) == False:
+    if os.path.isdir(config.anubi_path['custom_rule_path']) == True:
       for file_rule in os.listdir(config.anubi_path['custom_rule_path']):
         full_path_rule = "{}/{}".format(config.anubi_path['custom_rule_path'], file_rule)
         try:
@@ -85,7 +86,7 @@ def start_yara_scanner(yara_scanner, file_paths):
   config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Check for updating status")
   wait_for_updating('yara')
   config.yara_scan.set(True)
-  config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Scan started")
+  config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Yara scan started")
   try:
     for file_path in file_paths:
       if os.path.isdir(file_path):
@@ -99,7 +100,7 @@ def start_yara_scanner(yara_scanner, file_paths):
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during start_yara_scanner")
-  config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Scan finished")
+  config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Yara scan finished")
   config.yara_scan.set(False)
 
 def yara_scanner_polling(yara_scanner, file_paths):

@@ -5,6 +5,7 @@ import pathlib
 import re
 import subprocess
 import traceback
+import sys
 
 from core.common import (
   wait_for_updating,
@@ -36,7 +37,7 @@ class HashScanner:
     self.load_rules()
 
   def load_rules(self):
-    if os.path.isdir(config.anubi_path['hash_path']) == False:
+    if os.path.isdir(config.anubi_path['hash_path']) == True:
       for file_hash in os.listdir(config.anubi_path['hash_path']):
         full_path_hash = "{}/{}".format(config.anubi_path['hash_path'], file_hash)
         try:
@@ -48,7 +49,7 @@ class HashScanner:
           config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
           config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
           config.loggers["resources"]["logger_anubi_hash"].get_logger().warning("Skipped {}".format(full_path_hash))
-    if os.path.isdir(config.anubi_path['custom_hash_path']) == False:
+    if os.path.isdir(config.anubi_path['custom_hash_path']) == True:
       for file_hash in os.listdir(config.anubi_path['custom_hash_path']):
         full_path_hash = "{}/{}".format(config.anubi_path['custom_hash_path'], file_hash)
         try:
@@ -85,7 +86,7 @@ def start_hash_scanner(hash_scanner, file_paths):
   config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Check for updating status")
   wait_for_updating('hash')
   config.hash_scan.set(True)
-  config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Scan started")
+  config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Hash scan started")
   try:
     for file_path in file_paths:
       if os.path.isdir(file_path):
@@ -99,7 +100,7 @@ def start_hash_scanner(hash_scanner, file_paths):
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during start_hash_scanner")
-  config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Scan finished")
+  config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Hash scan finished")
   config.hash_scan.set(False)
 
 def hash_scanner_polling(hash_scanner, file_paths):
