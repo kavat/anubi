@@ -1,8 +1,11 @@
 import config
 import time
 
-from flask import Flask
-from flask import request
+from flask import (
+  Flask,
+  request
+)
+from core.common import pull_rules_repo
 
 app = Flask(__name__)
 
@@ -11,7 +14,7 @@ def index():
   if request.method == 'GET':
     if request.args.get('func'):
       if request.args.get('func') == 'help':
-        return "refresh_yara|refresh_hash|refresh_ip"
+        return "download_signatures|refresh_yara|refresh_hash|refresh_ip"
       if request.args.get('func') == 'refresh_yara':
         if config.yara_scan.get() == True:
           return "Non aggiorno per scansione in corso"
@@ -36,6 +39,8 @@ def index():
           config.scanners['ip_checker'].load_rules()
           config.updater_ip.set_updating(False)
           return "ok"
+      if request.args.get('func') == 'download_signatures':
+        return pull_rules_repo('management')
     else:
       return "no_func_arg"
   else:

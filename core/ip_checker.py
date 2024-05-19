@@ -96,7 +96,7 @@ class IpChecker:
           if dst in self.ip_tables and ipaddress.ip_address(dst).is_private == False:    
             config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{}".format(dst, dport, proto, src, sport))
           if src in self.ip_tables and ipaddress.ip_address(src).is_private == False:
-            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{}".format(src, sport, proto, src, sport))
+            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{}".format(src, sport, proto, dst, dport))
     except Exception as e:
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
       config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)

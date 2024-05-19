@@ -151,10 +151,14 @@ def init_rules_repo(thread_name):
 
 def pull_rules_repo(thread_name):
   config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Init pull rules repo")
-  p = subprocess.Popen("cd {} && git pull".format(config.anubi_path['rule_path']), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  p = subprocess.Popen("cd {} && git checkout -- . && git pull".format(config.anubi_path['rule_path']), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  ritorno = ""
   for line in p.stdout.readlines():
     config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Update rules repo stdout: {}".format(line.decode('ascii').rstrip()))
+    ritorno = "{}{}".format(ritorno, line.decode('ascii'))
+  ritorno = "{}exit_status: {}".format(ritorno, p.wait())
   config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Update rules repo exit_status: {}".format(p.wait()))
+  return ritorno
 
 def get_current_hours_minutes():
   c = datetime.now()
