@@ -23,3 +23,9 @@ Scan is a passive monitoring on the filesystem root applying IP rules generated 
 
 ### Filesystem modifications
 Scan is an active monitoring on the filesystem directories specified (as default system tries to identify Downlaods and media such USB) applying previously [Yara](https://github.com/kavat/anubi-signatures/tree/main/yara) and [Hash](https://github.com/kavat/anubi-signatures/tree/main/hash) rules
+
+## Run
+Anubi is developed to be run on Linux and further release will provides same functions on Windows and Mac.
+
+In order to print full options, run Anubi with --help; the following options will be returned:
+![Anubu help](images/anubi_help.png)
