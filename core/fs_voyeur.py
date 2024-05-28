@@ -50,9 +50,9 @@ class FsVoyeurEvent(LoggingEventHandler):
           yara_scan_file(self.yara_scanner, event.src_path, 'voyeur')
           config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Finished yara scanning on {}".format(event.src_path))
         except Exception as e:
-          config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Exception during yara on {}".format(event.src_path))
+          config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Exception during yara_voyeur on {}".format(event.src_path))
           config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical(e, exc_info=True)
-          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("yara_voyeur() BOOM!!!")
           pass
         config.yara_scan.set(False)
       if config.conf_anubi['hash_live']:
@@ -63,9 +63,9 @@ class FsVoyeurEvent(LoggingEventHandler):
           hash_scan_file(self.hash_scanner, event.src_path, 'voyeur')
           config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Finished hash scanning on {}".format(event.src_path))
         except Exception as e:
-          config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Exception during hash scan on {}".format(event.src_path))
+          config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Exception during hash_voyeur scan on {}".format(event.src_path))
           config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical(e, exc_info=True)
-          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("hash_voyeur() BOOM!!!")
           pass
         config.hash_scan.set(False)
 
@@ -105,9 +105,10 @@ def fs_voyeur_polling(fs_voyeur):
     #while True:
     #  time.sleep(1)
   except Exception as e:
+    config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Error during fs_voyeur_polling")
     config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical(e, exc_info=True)
-    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
-    config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Waiting {} for process restart".format(config.sleep_thread_restart))
+    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("FsVoyeur() BOOM!!!")
+    config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("VOYEUR: Waiting {} for process restart".format(config.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)
-    config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Restarting process")
+    config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("VOYEUR: Thread restarted")
     fs_voyeur_polling(fs_voyeur)

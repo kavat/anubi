@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys
 import os
 import config
@@ -31,7 +33,8 @@ from core.common import (
   init_rules_repo,
   get_current_hours_minutes,
   get_voyeur_dirs,
-  check_string_time
+  check_string_time,
+  check_anubi_struct
 )
 from argparse import ArgumentParser
 
@@ -56,23 +59,19 @@ if args.check_conf == True:
   sys.exit(1)
 
 if args.check_struct == True:
-  for dir in config.anubi_path:
-    if os.path.isdir(config.anubi_path[dir]) == True:
-      print("{} in path {} exists".format(dir, config.anubi_path[dir]))
-    else:
-      print("{} in path {} not exists".format(dir, config.anubi_path[dir]))    
+  check_anubi_struct()
   sys.exit(1)
 
 if args.create_struct == True:
   if os.path.isdir(config.anubi_path['conf_path']) == False:
     os.mkdir(config.anubi_path['conf_path'], mode=0o755)
-    init_rules_repo('main')
-    for dir in config.anubi_path:
-      if dir != "configfile_path":
+  init_rules_repo('main')
+  for dir in config.anubi_path:
+    if dir != "configfile_path":
+      if os.path.isdir(config.anubi_path[dir]) == False:
+        os.mkdir(config.anubi_path[dir], mode=0o755)
         if os.path.isdir(config.anubi_path[dir]) == False:
-          os.mkdir(config.anubi_path[dir], mode=0o755)
-          if os.path.isdir(config.anubi_path[dir]) == False:
-            print("{} in path {} not exists".format(dir, config.anubi_path[dir]))
+          print("{} in path {} not exists".format(dir, config.anubi_path[dir]))
   sys.exit(1)
 
 if args.wipe == True:
@@ -81,6 +80,10 @@ if args.wipe == True:
   sys.exit(1)
 
 if args.start == True:
+
+  if check_anubi_struct() == False:
+    print("Something wrong during structure checks, run --create-struct before")
+    sys.exit(1)
 
   if os.path.isfile(config.anubi_path['configfile_path']) == False:
     first_setup()

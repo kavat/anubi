@@ -97,9 +97,9 @@ def start_hash_scanner(hash_scanner, file_paths):
       if os.path.isfile(file_path):
         hash_scan_file(hash_scanner, file_path, 'hash')
   except Exception as e:
-    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
-    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during start_hash_scanner")
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
+    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("start_hash_scanner() BOOM!!!")
   config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Hash scan finished")
   config.hash_scan.set(False)
 
@@ -110,10 +110,11 @@ def hash_scanner_polling(hash_scanner, file_paths):
         start_hash_scanner(hash_scanner, file_paths)
       time.sleep(20)
   except Exception as e:
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during hash_scanner_polling")
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
-    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
-    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Waiting {} for process restart".format(config.sleep_thread_restart))
+    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("hash_scanner_polling() BOOM!!!")
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Waiting {} for process restart".format(config.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)
-    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Restarting process")
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Thread restarted")
     hash_scanner_polling(hash_scanner, file_paths)
 

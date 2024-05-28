@@ -43,7 +43,7 @@ class IpChecker:
         try:
           with open(full_path_ip) as f:
             for line in f:
-              self.ip_tables[line.rstrip()] = 1
+              self.ip_tables[line.rstrip().split(":")[0]] = line.rstrip().split(":")[1]
           config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Loaded {}".format(full_path_ip))
         except Exception as e:
           config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
@@ -63,15 +63,18 @@ class IpChecker:
           config.loggers["resources"]["logger_anubi_ip"].get_logger().warning("Skipped {}".format(full_path_ip))
 
   def sniff(self, interface):
+    config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Starting sniffer on {}".format(interface))
+    scapy.all.sniff(iface=interface, store=False, prn=self.process_sniffed_packet)
+
+  def sniff_old(self, interface):
     try:
       config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Starting sniffer on {}".format(interface))
       scapy.all.sniff(iface=interface, store=False, prn=self.process_sniffed_packet)
     except Exception as e:
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
-      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Tra {} riavvio il thread".format(config.sleep_thread_restart))
-      config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("Tra {} riavvio il thread".format(config.sleep_thread_restart))
-      time.sleep(config.sleep_thread_socket_restart)
-      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Riavvio thread")
+      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("SNIFFER: Waiting {} for process restart".format(config.sleep_thread_restart))
+      time.sleep(config.sleep_thread_restart)
+      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("SNIFFER: thread restarted")
       self.sniff(interface)
 
   def process_sniffed_packet(self, packet):
@@ -94,13 +97,13 @@ class IpChecker:
           sport = packet[UDP].sport
         if proto != "":
           if dst in self.ip_tables and ipaddress.ip_address(dst).is_private == False:    
-            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{}".format(dst, dport, proto, src, sport))
+            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{} ({})".format(dst, dport, proto, src, sport, self.ip_tables[dst]))
           if src in self.ip_tables and ipaddress.ip_address(src).is_private == False:
-            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{}".format(src, sport, proto, dst, dport))
+            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{} ({})".format(src, sport, proto, dst, dport, self.ip_tables[src]))
     except Exception as e:
+      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Error during process_sniffed_packet")
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
-      config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
-      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Exception during network packet inspection")
+      config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("process_sniffed_packet() BOOM!!!")
     config.ip_check.set(False)
 
 def start_ip_checker(ip_checker, iface):
@@ -110,10 +113,11 @@ def ip_checker_polling(ip_checker, iface):
   try:
     start_ip_checker(ip_checker, iface)
   except Exception as e:
+    config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Error during ip_checker_polling")
     config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
-    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
-    config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Waiting {} for process restart".format(config.sleep_thread_restart))
+    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("ip_checker_polling() BOOM!!!")
+    config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("SNIFFER: Waiting {} for process restart".format(config.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)
-    config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Restarting process")
+    config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("SNIFFER: Thread restarted")
     ip_checker_polling(ip_checker, iface)
 

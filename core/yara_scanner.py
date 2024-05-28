@@ -97,9 +97,9 @@ def start_yara_scanner(yara_scanner, file_paths):
       if os.path.isfile(file_path):
         yara_scan_file(yara_scanner, file_path, 'yara')
   except Exception as e:
-    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
-    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during start_yara_scanner")
+    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
+    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("start_yara_scanner() BOOM!!!")
   config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Yara scan finished")
   config.yara_scan.set(False)
 
@@ -110,10 +110,11 @@ def yara_scanner_polling(yara_scanner, file_paths):
         start_yara_scanner(yara_scanner, file_paths)
       time.sleep(20)
   except Exception as e:
+    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during yara_scanner_polling")
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
-    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
-    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Waiting {} for process restart".format(config.sleep_thread_restart))
+    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("yara_scanner_polling() BOOM!!!")
+    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("YARA: Waiting {} for process restart".format(config.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)
-    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Restarting process")
+    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("YARA: Thread restarted")
     yara_scanner_polling(yara_scanner, file_paths)
   

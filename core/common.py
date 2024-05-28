@@ -182,3 +182,15 @@ def get_voyeur_dirs():
     for dir_ in config.voyeur_dirs_nowild:
       d.append(dir_)
   return d
+
+def check_anubi_struct():
+  ritorno = True
+  for dir in config.anubi_path:
+    if os.path.isdir(config.anubi_path[dir]) == True:
+      print("Directory {} in path {} exists".format(dir, config.anubi_path[dir]))
+    else:
+      if os.path.isfile(config.anubi_path[dir]) == True:
+        print("File {} in path {} exists".format(dir, config.anubi_path[dir]))
+      else:
+        ritorno = False
+  return ritorno
