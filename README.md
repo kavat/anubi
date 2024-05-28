@@ -32,10 +32,10 @@ In order to print full options, run Anubi with --help; the following options wil
 ![Anubu help](images/anubi_help.png)
 
 In details, options available are the following:
-1.  -h, --help       Used to show the current help message and exit
-2.  --check-conf     Used to check the current configuration and exit
-3.  --check-struct   Used to check Anubi directory structure and exit
-4.  --create-struct  Used to create Anubi directory structure needed and exit
-5.  --init           Used to init runtime.dat configuration file in order to set features to protect us and exit
-6.  --start          Used to start Anubi with configuration created (if runtime.dat is not present, it will be created before starting)
-7.  --wipe           Used to erase Anubi logs and exit
+*  -h, --help       Used to show the current help message and exit
+*  --check-conf     Used to check the current configuration and exit
+*  --check-struct   Used to check Anubi directory structure and exit
+*  --create-struct  Used to create Anubi directory structure needed and exit
+*  --init           Used to init runtime.dat configuration file in order to set features to protect us and exit
+*  --start          Used to start Anubi with configuration created (if runtime.dat is not present, it will be created before starting)
+*  --wipe           Used to erase Anubi logs and exit
