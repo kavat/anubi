@@ -46,7 +46,8 @@ parser.add_argument('--check-conf', action='store_true', help='Check current con
 parser.add_argument('--check-struct', action='store_true', help='Check Anubi directory structure') 
 parser.add_argument('--create-struct', action='store_true', help='Create Anubi directory structure') 
 parser.add_argument('--init', action='store_true', help='Init configuration')
-parser.add_argument('--start', action='store_true', help='Start Anubi with configuration created')
+parser.add_argument('--start', action='store_true', help='Start Anubi with configuration created and rules already present')
+parser.add_argument('--start-full', action='store_true', help='Start Anubi with configuration created downloading last rules')
 parser.add_argument('--wipe', action='store_true', help='Wipe Anubi logs')
 args = parser.parse_args()
 
@@ -79,7 +80,7 @@ if args.wipe == True:
     config.loggers["resources"][logger_name].wipe()
   sys.exit(1)
 
-if args.start == True:
+if args.start == True or args.start_full == True:
 
   if check_anubi_struct() == False:
     print("Something wrong during structure checks, run --create-struct before")
@@ -88,7 +89,9 @@ if args.start == True:
   if os.path.isfile(config.anubi_path['configfile_path']) == False:
     first_setup()
 
-  init_rules_repo('main')
+  if args.start_full == True:
+    init_rules_repo('main')
+
   config.conf_anubi = get_anubi_conf('list')
 
   try:

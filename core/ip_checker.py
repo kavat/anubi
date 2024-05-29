@@ -66,17 +66,6 @@ class IpChecker:
     config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Starting sniffer on {}".format(interface))
     scapy.all.sniff(iface=interface, store=False, prn=self.process_sniffed_packet)
 
-  def sniff_old(self, interface):
-    try:
-      config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Starting sniffer on {}".format(interface))
-      scapy.all.sniff(iface=interface, store=False, prn=self.process_sniffed_packet)
-    except Exception as e:
-      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
-      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("SNIFFER: Waiting {} for process restart".format(config.sleep_thread_restart))
-      time.sleep(config.sleep_thread_restart)
-      config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("SNIFFER: thread restarted")
-      self.sniff(interface)
-
   def process_sniffed_packet(self, packet):
     wait_for_updating('ip')
     config.ip_check.set(True)
