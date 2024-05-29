@@ -89,35 +89,36 @@ def check_string_time(string):
 def first_setup():
   print("Welcome to the first setup for Anubi!")
   try:
-    f = open(config.anubi_path['configfile_path'], "w")
     print("Enter the answers for the following questions in order to build your configuration")
     loop_until_input("Do you want start? (Y/N) ", ['Y','N'])
     ioc_ = loop_until_input("Do you want enable daily passive IOC detection? (Y/N) ", ['Y','N'])
-    f.write("yara={}\n".format(ioc_))
+    anubi_conf_str = "yara={}\n".format(ioc_)
     if ioc_ == "Y":
       ioc_scan_ = loop_until_input("Set to time to start daily passive IOC detection: (HH:mm) ", r'^[0-9][0-9]\:[0-9][0-9]$')
-      f.write("yara_hhmm={}\n".format(ioc_scan_))
+      anubi_conf_str = "{}yara_hhmm={}\n".format(anubi_conf_str, ioc_scan_)
     hash_ = loop_until_input("Do you want enable daily passive malware detection? (Y/N) ", ['Y','N'])
-    f.write("hash={}\n".format(hash_))
+    anubi_conf_str = "{}hash={}\n".format(anubi_conf_str, hash_)
     if hash_ == "Y":
       hash_scan_ = loop_until_input("Set to time to start daily passive malware detection: (HH:mm) ", r'^[0-9][0-9]\:[0-9][0-9]$')
-      f.write("hash_hhmm={}\n".format(hash_scan_))
+      anubi_conf_str = "{}hash_hhmm={}\n".format(anubi_conf_str, hash_scan_)
     ip_ = loop_until_input("Do you want enable suspicious network traffic detection? (Y/N) ", ['Y','N'])
-    f.write("ip={}\n".format(ip_))
+    anubi_conf_str = "{}ip={}\n".format(anubi_conf_str, ip_)
     if ip_ == "Y": 
       addrs = psutil.net_if_addrs()
       list_ens = []
       for ens__ in addrs.keys():
         list_ens.append(ens__)
       ens_ = loop_until_input("Set the interface to be monitored: [{}] ".format(','.join(list_ens)), list_ens)
-      f.write("eth={}\n".format(ens_))
+      anubi_conf_str = "{}eth={}\n".format(anubi_conf_str, ens_)
     live_ = loop_until_input("Do you want enable live directory scan? (Y/N) ", ['Y','N'])
-    f.write("live={}\n".format(live_))
+    anubi_conf_str = "{}live={}\n".format(anubi_conf_str, live_)
     if live_ == "Y":
       live_ioc_ = loop_until_input("Do you want enable live active IOC detection? (Y/N) ", ['Y','N'])
-      f.write("yara_live={}\n".format(live_ioc_))
+      anubi_conf_str = "{}yara_live={}\n".format(anubi_conf_str, live_ioc_)
       live_hash_ = loop_until_input("Do you want enable live active malware detection? (Y/N) ", ['Y','N'])
-      f.write("hash_live={}\n".format(live_hash_))
+      anubi_conf_str = "{}hash_live={}\n".format(anubi_conf_str, live_hash_)
+    f = open(config.anubi_path['configfile_path'], "w")
+    f.write(anubi_conf_str)
     f.close()
     return True
   except Exception as e:
@@ -186,11 +187,12 @@ def get_voyeur_dirs():
 def check_anubi_struct():
   ritorno = True
   for dir in config.anubi_path:
-    if os.path.isdir(config.anubi_path[dir]) == True:
-      print("Directory {} in path {} exists".format(dir, config.anubi_path[dir]))
-    else:
-      if os.path.isfile(config.anubi_path[dir]) == True:
-        print("File {} in path {} exists".format(dir, config.anubi_path[dir]))
+    if dir != "configfile_path":
+      if os.path.isdir(config.anubi_path[dir]) == True:
+        print("Directory {} in path {} exists".format(dir, config.anubi_path[dir]))
       else:
-        ritorno = False
+        if os.path.isfile(config.anubi_path[dir]) == True:
+          print("File {} in path {} exists".format(dir, config.anubi_path[dir]))
+        else:
+          ritorno = False
   return ritorno
