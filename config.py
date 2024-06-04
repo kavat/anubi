@@ -34,18 +34,20 @@ anubi_path = {
   "custom_rule_path": "{}/conf/custom_rules".format(application_path),
   "custom_hash_path": "{}/conf/custom_hash".format(application_path),
   "custom_ip_path": "{}/conf/custom_ip".format(application_path),
+  "log_path": "{}/log".format(application_path),
   "configfile_path": "{}/conf/runtime.dat".format(application_path)
 }
 
 log_to_stdout = True
 
-path_logger_anubi_main = "/var/log/anubi_main.log"
-path_logger_anubi_yara = "/var/log/anubi_yara.log"
-path_logger_anubi_hash = "/var/log/anubi_hash.log"
-path_logger_anubi_ip = "/var/log/anubi_ip.log"
-path_logger_anubi_voyeur = "/var/log/anubi_voyeur.log"
-path_logger_anubi_management = "/var/log/anubi_management.log"
-path_logger_anubi_master_exceptions = "/var/log/anubi_boom.log"
+base_log = anubi_path['log_path']
+path_logger_anubi_main = "{}/anubi_main.log".format(base_log)
+path_logger_anubi_yara = "{}/anubi_yara.log".format(base_log)
+path_logger_anubi_hash = "{}/anubi_hash.log".format(base_log)
+path_logger_anubi_ip = "{}/anubi_ip.log".format(base_log)
+path_logger_anubi_voyeur = "{}/anubi_voyeur.log".format(base_log)
+path_logger_anubi_management = "{}/anubi_management.log".format(base_log)
+path_logger_anubi_master_exceptions = "{}/anubi_boom.log".format(base_log)
 
 loggers = {}
 loggers["resources"] = {}

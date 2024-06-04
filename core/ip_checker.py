@@ -65,7 +65,7 @@ class IpChecker:
             for line in f:
               ip_tag_name = line.rstrip().split(":")[1]
               ip_risk = line.rstrip().split(":")[2]
-              self.ip_tables[self.ip_tables[line.rstrip().split(":")[0]] = { "tag_name": ip_tag_name, "risk": ip_risk }line.rstrip()] = 1
+              self.ip_tables[line.rstrip().split(":")[0]] = { "tag_name": ip_tag_name, "risk": ip_risk }
           config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Loaded {}".format(full_path_ip))
         except Exception as e:
           config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
