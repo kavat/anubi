@@ -43,19 +43,29 @@ class IpChecker:
         try:
           with open(full_path_ip) as f:
             for line in f:
-              self.ip_tables[line.rstrip().split(":")[0]] = line.rstrip().split(":")[1]
+              try:
+                ip_tag_name = line.rstrip().split(":")[1]
+                ip_risk = line.rstrip().split(":")[2]
+                if ip_tag_name != "NoTag":
+                  ip_risk = 100
+                self.ip_tables[line.rstrip().split(":")[0]] = { "tag_name": ip_tag_name, "risk": ip_risk }
+              except Exception as ee:
+                config.loggers["resources"]["logger_anubi_ip"].get_logger().warning("Error on {}".format(line.rstrip()))
+                config.loggers["resources"]["logger_anubi_ip"].get_logger().warning(ee, exc_info=True)
           config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Loaded {}".format(full_path_ip))
         except Exception as e:
-          config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
-          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
           config.loggers["resources"]["logger_anubi_ip"].get_logger().warning("Skipped {}".format(full_path_ip))
+          config.loggers["resources"]["logger_anubi_ip"].get_logger().warning(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("ip load_rules() BOOM!!!")
     if os.path.isdir(config.anubi_path['custom_ip_path']) == True:
       for file_ip in os.listdir(config.anubi_path['custom_ip_path']):
         full_path_ip = "{}/{}".format(config.anubi_path['custom_ip_path'], file_ip)
         try:
           with open(full_path_ip) as f:
             for line in f:
-              self.ip_tables[line.rstrip()] = 1
+              ip_tag_name = line.rstrip().split(":")[1]
+              ip_risk = line.rstrip().split(":")[2]
+              self.ip_tables[self.ip_tables[line.rstrip().split(":")[0]] = { "tag_name": ip_tag_name, "risk": ip_risk }line.rstrip()] = 1
           config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Loaded {}".format(full_path_ip))
         except Exception as e:
           config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
@@ -86,9 +96,9 @@ class IpChecker:
           sport = packet[UDP].sport
         if proto != "":
           if dst in self.ip_tables and ipaddress.ip_address(dst).is_private == False:    
-            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{} ({})".format(dst, dport, proto, src, sport, self.ip_tables[dst]))
+            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{} ({} with risk {})".format(dst, dport, proto, src, sport, self.ip_tables[dst]["ip_tage_name"], self.ip_tables[dst]["ip_risk"]))
           if src in self.ip_tables and ipaddress.ip_address(src).is_private == False:
-            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{} ({})".format(src, sport, proto, dst, dport, self.ip_tables[src]))
+            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{} ({} with risk {})".format(src, sport, proto, dst, dport, self.ip_tables[dst]["ip_tage_name"], self.ip_tables[dst]["ip_risk"]))
     except Exception as e:
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Error during process_sniffed_packet")
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)

@@ -43,11 +43,15 @@ class HashScanner:
         try:
           with open(full_path_hash) as f:
             for line in f:
-              self.hash_tables[line.rstrip().split(":")[0]] = line.rstrip().split(":")[1]
+              try:
+                self.hash_tables[line.rstrip().split(":")[0]] = line.rstrip().split(":")[1]
+              except Exception as ee:
+                config.loggers["resources"]["logger_anubi_hash"].get_logger().warning("Error on {}".format(line.rstrip()))
+                config.loggers["resources"]["logger_anubi_hash"].get_logger().warning(ee, exc_info=True)
           config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Loaded {}".format(full_path_hash))
         except Exception as e:
           config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
-          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("hash load_rules() BOOM!!!")
           config.loggers["resources"]["logger_anubi_hash"].get_logger().warning("Skipped {}".format(full_path_hash))
     if os.path.isdir(config.anubi_path['custom_hash_path']) == True:
       for file_hash in os.listdir(config.anubi_path['custom_hash_path']):

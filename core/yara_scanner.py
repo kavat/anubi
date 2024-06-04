@@ -46,7 +46,7 @@ class YaraScanner:
           rules[full_path_rule] = full_path_rule
         except Exception as e:
           config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
-          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("yara load_rules() BOOM!!!")
           config.loggers["resources"]["logger_anubi_yara"].get_logger().warning("Skipped {}".format(full_path_rule))
     if os.path.isdir(config.anubi_path['custom_rule_path']) == True:
       for file_rule in os.listdir(config.anubi_path['custom_rule_path']):
