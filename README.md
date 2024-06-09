@@ -47,20 +47,20 @@ Linux, MacOS and Windows are supported by Anubi engine.
 ## Dependencies
 External dependencies are needed:
 * Git
- * Linux (Debian): `apt install git-core`
- * Linux (Centos): `yum install git-core`
- * MacOS: `brew install git`
- * Windows: `Install-Module posh-git -Scope CurrentUser -Force`
+  * Linux (Debian): `apt install git-core`
+  * Linux (Centos): `yum install git-core`
+  * MacOS: `brew install git`
+  * Windows: `Install-Module posh-git -Scope CurrentUser -Force`
 * Python3
- * Linux (Debian): `apt install python3`
- * Linux (Centos): `yum install python3`
- * MacOS: `brew install python3`
- * Windows: follow [official documentation](https://www.python.org/downloads/windows/)
+  * Linux (Debian): `apt install python3`
+  * Linux (Centos): `yum install python3`
+  * MacOS: `brew install python3`
+  * Windows: follow [official documentation](https://www.python.org/downloads/windows/)
 * Python3 Pip
- * Linux (Debian): `apt install python3-pip` or `python3 -m ensurepip`
- * Linux (Centos): `yum install python3-pip` or `python3 -m ensurepip`
- * MacOS: `python3 -m ensurepip`
- * Windows: Pip will be install with Python3 installation, follow [official documentation](https://www.python.org/downloads/windows/)
+  * Linux (Debian): `apt install python3-pip` or `python3 -m ensurepip`
+  * Linux (Centos): `yum install python3-pip` or `python3 -m ensurepip`
+  * MacOS: `python3 -m ensurepip`
+  * Windows: Pip will be install with Python3 installation, follow [official documentation](https://www.python.org/downloads/windows/)
 * YARA
- * Linux/Windows: follow [official documentation](https://yara.readthedocs.io/en/stable/gettingstarted.html) 
- * MacOS: `brew install yara`
+  * Linux/Windows: follow [official documentation](https://yara.readthedocs.io/en/stable/gettingstarted.html) 
+  * MacOS: `brew install yara`
