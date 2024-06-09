@@ -95,3 +95,5 @@ voyeur_dirs_nowild = ["/tmp"]
 
 buf_size_calc_hash = 65536
 max_file_size = 52428800
+
+mac_top_dirs = ["Users", "opt"]

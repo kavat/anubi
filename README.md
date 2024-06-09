@@ -24,23 +24,6 @@ Scan is a passive monitoring on the filesystem root applying IP rules generated 
 ### Filesystem modifications
 Scan is an active monitoring on the filesystem directories specified (as default system tries to identify Downlaods and media such USB) applying previously [Yara](https://github.com/kavat/anubi-signatures/tree/main/yara) and [Hash](https://github.com/kavat/anubi-signatures/tree/main/hash) rules
 
-## Run
-Anubi is developed to be run on Linux and further release will provides same functions on Windows and Mac.
-
-In order to print full options, run Anubi with --help; the following options will be returned:
-
-![Anubu help](images/anubi_help.png)
-
-In details, options available are the following:
-*  -h, --help       used to show the current help message and exit
-*  --check-conf     used to check the current configuration and exit
-*  --check-struct   used to check Anubi directory structure and exit
-*  --create-struct  used to create Anubi directory structure needed and exit
-*  --init           used to init runtime.dat configuration file in order to set features to protect us and exit
-*  --start          used to start Anubi with configuration created and rules already present
-*  --start-full     used to start Anubi with configuration created (if runtime.dat is not present, it will be created before starting), rules will be downloaded or updated
-*  --wipe           used to erase Anubi logs and exit
-
 ## OS supported
 Linux, MacOS and Windows are supported by Anubi engine.
 
@@ -66,3 +49,32 @@ External dependencies are needed:
   * MacOS: `brew install yara`
 
 Relating di Pip modules, install dependecies through `pip install -r pip_requirements.txt`
+
+## Run
+Anubi is developed to be run on Linux and further release will provides same functions on Windows and Mac.
+
+In order to print full options, run Anubi with --help; the following options will be returned:
+
+![Anubu help](images/anubi_help.png)
+
+In details, options available are the following:
+*  -h, --help       used to show the current help message and exit
+*  --check-conf     used to check the current configuration and exit
+*  --check-struct   used to check Anubi directory structure and exit
+*  --create-struct  used to create Anubi directory structure needed and exit
+*  --init           used to init runtime.dat configuration file in order to set features to protect us and exit
+*  --start          used to start Anubi with configuration created and rules already present
+*  --start-full     used to start Anubi with configuration created (if runtime.dat is not present, it will be created before starting), rules will be downloaded or updated
+*  --wipe           used to erase Anubi logs and exit
+
+In order to start and control our assets, follow the flow below:
+* clone repo
+* install dependencies
+* run Anubi with --create-struct to prepare system
+* run Anubi with --init to create the configuration for periodic scan
+* run Anubi with --start-full
+
+During start at first time Anubi will ask for internal set up, as:
+* periodic IOC/malware scan
+* live network activities monitoring
+* particular directories hooks where IOC and malware detections will be applied at files creation/modification

@@ -34,7 +34,8 @@ from core.common import (
   get_current_hours_minutes,
   get_voyeur_dirs,
   check_string_time,
-  check_anubi_struct
+  check_anubi_struct,
+  create_anubi_struct
 )
 from argparse import ArgumentParser
 
@@ -68,15 +69,7 @@ if args.check_struct == True:
   sys.exit(1)
 
 if args.create_struct == True:
-  if os.path.isdir(config.anubi_path['conf_path']) == False:
-    os.mkdir(config.anubi_path['conf_path'], mode=0o755)
-  init_rules_repo('main')
-  for dir in config.anubi_path:
-    if dir != "configfile_path":
-      if os.path.isdir(config.anubi_path[dir]) == False:
-        os.mkdir(config.anubi_path[dir], mode=0o755)
-        if os.path.isdir(config.anubi_path[dir]) == False:
-          print("{} in path {} not exists".format(dir, config.anubi_path[dir]))
+  create_anubi_struct()
   sys.exit(1)
 
 if args.wipe == True:
@@ -84,17 +77,21 @@ if args.wipe == True:
     config.loggers["resources"][logger_name].wipe()
   sys.exit(1)
 
+if args.start == True and args.start_full == True:
+  print("Can not use --start with --start-full, use one")
+  sys.exit(1)
+
 if args.start == True or args.start_full == True:
 
-  if check_anubi_struct() == False:
+  if args.start == True and check_anubi_struct() == False:
     print("Something wrong during structure checks, run --create-struct before")
     sys.exit(1)
 
+  if args.start_full == True:
+    create_anubi_struct()
+
   if os.path.isfile(config.anubi_path['configfile_path']) == False:
     first_setup()
-
-  if args.start_full == True:
-    init_rules_repo('main')
 
   config.conf_anubi = get_anubi_conf('list')
 

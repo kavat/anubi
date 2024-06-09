@@ -172,12 +172,23 @@ def get_linux_dirs(dir_):
     r.append(line.decode('ascii').rstrip())
   return r
 
+def get_macos_dirs(dir_):
+  r = []
+  for top_dir in config.mac_top_dirs:
+    p = subprocess.Popen("find /{} -type d -name \"{}\"".format(top_dir, dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in p.stdout.readlines():
+      r.append(line.decode('ascii').rstrip())
+  return r
+
 def get_voyeur_dirs():
   d = []
   if config.voyeur_dirs_wild != []:
     for dir_ in config.voyeur_dirs_wild:
       if get_platform() == "linux":
         for dir_r in get_linux_dirs(dir_):
+          d.append(dir_r)
+      if get_platform() == "macos":
+        for dir_r in get_macos_dirs(dir_): 
           d.append(dir_r)
   if config.voyeur_dirs_nowild != []:
     for dir_ in config.voyeur_dirs_nowild:
@@ -196,3 +207,14 @@ def check_anubi_struct():
         else:
           ritorno = False
   return ritorno
+
+def create_anubi_struct():
+  if os.path.isdir(config.anubi_path['conf_path']) == False:
+    os.mkdir(config.anubi_path['conf_path'], mode=0o755)
+  init_rules_repo('main')
+  for dir in config.anubi_path:
+    if dir != "configfile_path":
+      if os.path.isdir(config.anubi_path[dir]) == False:
+        os.mkdir(config.anubi_path[dir], mode=0o755)
+        if os.path.isdir(config.anubi_path[dir]) == False:
+          print("{} in path {} not exists".format(dir, config.anubi_path[dir]))
