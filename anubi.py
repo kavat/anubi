@@ -51,6 +51,10 @@ parser.add_argument('--start-full', action='store_true', help='Start Anubi with 
 parser.add_argument('--wipe', action='store_true', help='Wipe Anubi logs')
 args = parser.parse_args()
 
+if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False:
+  print("Run with argument or -h/--help")
+  sys.exit(1)
+
 if args.init == True:
   first_setup()
   sys.exit(1)

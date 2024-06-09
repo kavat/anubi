@@ -37,5 +37,30 @@ In details, options available are the following:
 *  --check-struct   used to check Anubi directory structure and exit
 *  --create-struct  used to create Anubi directory structure needed and exit
 *  --init           used to init runtime.dat configuration file in order to set features to protect us and exit
-*  --start          used to start Anubi with configuration created (if runtime.dat is not present, it will be created before starting)
+*  --start          used to start Anubi with configuration created and rules already present
+*  --start-full     used to start Anubi with configuration created (if runtime.dat is not present, it will be created before starting), rules will be downloaded or updated
 *  --wipe           used to erase Anubi logs and exit
+
+## OS supported
+Linux, MacOS and Windows are supported by Anubi engine.
+
+## Dependencies
+External dependencies are needed:
+* Git
+** Linux (Debian): `apt install git-core`
+** Linux (Centos): `yum install git-core`
+** MacOS: `brew install git`
+** Windows: `Install-Module posh-git -Scope CurrentUser -Force`
+* Python3
+** Linux (Debian): `apt install python3`
+** Linux (Centos): `yum install python3`
+** MacOS: `brew install python3`
+** Windows: follow [official documentation](https://www.python.org/downloads/windows/)
+* Python3 Pip
+** Linux (Debian): `apt install python3-pip` or `python3 -m ensurepip`
+** Linux (Centos): `yum install python3-pip` or `python3 -m ensurepip`
+** MacOS: `python3 -m ensurepip`
+** Windows: Pip will be install with Python3 installation, follow [official documentation](https://www.python.org/downloads/windows/)
+* YARA
+** Linux/Windows: follow [official documentation](https://yara.readthedocs.io/en/stable/gettingstarted.html) 
+** MacOS: `brew install yara`
