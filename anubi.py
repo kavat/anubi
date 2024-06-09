@@ -4,6 +4,7 @@ import sys
 import os
 import config
 import time
+import conf_anubi
 
 from core.anubi_thread import (
   AnubiThread,
@@ -132,7 +133,7 @@ if args.start == True or args.start_full == True:
     else:
       config.loggers["resources"]["logger_anubi_main"].get_logger().warning("Voyeur checker not enabled")
 
-    config.threads["management"] = AnubiThread("management", start_api, (config.management_host,config.management_port,))
+    config.threads["management"] = AnubiThread("management", start_api, (conf_anubi.management_host,conf_anubi.management_port,))
 
     start_threads()
 

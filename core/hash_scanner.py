@@ -6,6 +6,7 @@ import re
 import subprocess
 import traceback
 import sys
+import conf_anubi
 
 from core.common import (
   wait_for_updating,
@@ -68,11 +69,11 @@ class HashScanner:
 
   def check(self, file_path):
     (sha1_file, sha256_file, md5_file) = get_hash_file(file_path)
-    if sha1_file in self.hash_tables:
+    if sha1_file is not None and sha1_file in self.hash_tables:
       return self.hash_tables[sha1_file]
-    if sha256_file in self.hash_tables: 
+    if sha256_file is not None and sha256_file in self.hash_tables: 
       return self.hash_tables[sha256_file]
-    if md5_file in self.hash_tables: 
+    if md5_file is not None and md5_file in self.hash_tables: 
       return self.hash_tables[md5_file]
     return ""
 
@@ -117,7 +118,7 @@ def hash_scanner_polling(hash_scanner, file_paths):
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during hash_scanner_polling")
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("hash_scanner_polling() BOOM!!!")
-    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Waiting {} for process restart".format(config.sleep_thread_restart))
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Waiting {} for process restart".format(conf_anubi.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Thread restarted")
     hash_scanner_polling(hash_scanner, file_paths)

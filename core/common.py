@@ -7,6 +7,7 @@ import hashlib
 import re
 import subprocess
 import psutil
+import conf_anubi
 
 from sys import platform as _platform
 from datetime import datetime
@@ -40,28 +41,33 @@ def get_hash_file(file_path):
   sha1 = hashlib.sha1()
   sha256 = hashlib.sha256()
 
-  with open(file_path, 'rb') as f:
-    while True:
-      data = f.read(config.buf_size_calc_hash)
-      if not data:
-        break
-      md5.update(data)
-      sha1.update(data)
-      sha256.update(data)
+  try:
+    with open(file_path, 'rb') as f:
+      while True:
+        data = f.read(conf_anubi.buf_size_calc_hash)
+        if not data:
+          break
+        md5.update(data)
+        sha1.update(data)
+        sha256.update(data)
 
-  return (sha1.hexdigest(), sha256.hexdigest(), md5.hexdigest())
+    return (sha1.hexdigest(), sha256.hexdigest(), md5.hexdigest())
+  except Exception as e:
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during {} hash calc".format(file_path))
+  return (None, None, None)
 
 def file_exclusions(file_path):
-  for exclusion in config.linux_dir_exclusions:
-    if file_path.startswith(exclusion) == True:
-      return True
+  if get_platform() == "linux" or get_platform() == "macos":
+    for exclusion in conf_anubi.linux_dir_exclusions:
+      if file_path.startswith(exclusion) == True:
+        return True
   if file_path.startswith(config.application_path):
     return True
   file_extension = re.search('\.[^\/\.]+$', file_path)
   if file_extension:
-    if file_extension.group(0) in config.extension_exclusions:
+    if file_extension.group(0) in conf_anubi.extension_exclusions:
       return True
-  if os.path.getsize(file_path) > config.max_file_size:
+  if os.path.getsize(file_path) > conf_anubi.max_file_size:
     return True
   return False
 
@@ -174,7 +180,7 @@ def get_linux_dirs(dir_):
 
 def get_macos_dirs(dir_):
   r = []
-  for top_dir in config.mac_top_dirs:
+  for top_dir in conf_anubi.mac_top_dirs:
     p = subprocess.Popen("find /{} -type d -name \"{}\"".format(top_dir, dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in p.stdout.readlines():
       r.append(line.decode('ascii').rstrip())
@@ -182,16 +188,16 @@ def get_macos_dirs(dir_):
 
 def get_voyeur_dirs():
   d = []
-  if config.voyeur_dirs_wild != []:
-    for dir_ in config.voyeur_dirs_wild:
+  if conf_anubi.voyeur_dirs_wild != []:
+    for dir_ in conf_anubi.voyeur_dirs_wild:
       if get_platform() == "linux":
         for dir_r in get_linux_dirs(dir_):
           d.append(dir_r)
       if get_platform() == "macos":
         for dir_r in get_macos_dirs(dir_): 
           d.append(dir_r)
-  if config.voyeur_dirs_nowild != []:
-    for dir_ in config.voyeur_dirs_nowild:
+  if conf_anubi.voyeur_dirs_nowild != []:
+    for dir_ in conf_anubi.voyeur_dirs_nowild:
       d.append(dir_)
   return d
 

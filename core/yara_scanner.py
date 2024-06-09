@@ -6,6 +6,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import conf_anubi
 
 from core.common import (
   wait_for_updating,
@@ -113,8 +114,8 @@ def yara_scanner_polling(yara_scanner, file_paths):
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during yara_scanner_polling")
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("yara_scanner_polling() BOOM!!!")
-    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("YARA: Waiting {} for process restart".format(config.sleep_thread_restart))
-    time.sleep(config.sleep_thread_restart)
+    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("YARA: Waiting {} for process restart".format(conf_anubi.sleep_thread_restart))
+    time.sleep(conf_anubi.sleep_thread_restart)
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("YARA: Thread restarted")
     yara_scanner_polling(yara_scanner, file_paths)
   
