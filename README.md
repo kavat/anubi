@@ -64,3 +64,5 @@ External dependencies are needed:
 * YARA
   * Linux/Windows: follow [official documentation](https://yara.readthedocs.io/en/stable/gettingstarted.html) 
   * MacOS: `brew install yara`
+
+Relating di Pip modules, install dependecies through `pip install -r pip_requirements.txt`

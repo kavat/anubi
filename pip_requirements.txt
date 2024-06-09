@@ -1,0 +1,5 @@
+Flask
+psutil
+scapy
+watchdog
+yara-python
