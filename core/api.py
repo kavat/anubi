@@ -56,8 +56,8 @@ def start_api(host, port):
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("start_api() BOOM!!!")
     config.loggers["resources"]["logger_anubi_management"].get_logger().critical(e, exc_info=True)
     if check_tcp_conn(host, port) == False: 
-      config.loggers["resources"]["logger_anubi_management"].get_logger().critical("API: Waiting {} for process restart".format(conf_anubi.sleep_thread_restart))
-      time.sleep(conf_anubi.sleep_thread_socket_restart)
+      config.loggers["resources"]["logger_anubi_management"].get_logger().critical("API: Waiting {} for process restart".format(config.sleep_thread_restart))
+      time.sleep(config.sleep_thread_socket_restart)
       config.loggers["resources"]["logger_anubi_management"].get_logger().critical("API: Thread restarted")
       start_api(host, port)
     else:

@@ -9,6 +9,7 @@ Anubi combines four different engines to check your assets:
 2. Hash scanner
 3. IP check
 4. Filesystem modifications
+5. API
 
 These functionalities use a prepared set of rules available in [my repository](https://github.com/kavat/anubi-signatures) generated daily.
 
@@ -23,6 +24,14 @@ Scan is a passive monitoring on the filesystem root applying IP rules generated 
 
 ### Filesystem modifications
 Scan is an active monitoring on the filesystem directories specified (as default system tries to identify Downlaods and media such USB) applying previously [Yara](https://github.com/kavat/anubi-signatures/tree/main/yara) and [Hash](https://github.com/kavat/anubi-signatures/tree/main/hash) rules
+
+### API
+Anubi helps users with its own API system used to interact. 
+Command to connect with API system `curl http://127.0.0.1:5000/?func=help` provides available references:
+* download_signatures, `http://127.0.0.1:5000/?func=download_signatures` allows pulling from anubi-signatures repository for rules update without reload them in Anubi
+* refresh_yara, `http://127.0.0.1:5000/?func=refresh_yara` refreshes official and custom Yara rules
+* refresh_hash, `http://127.0.0.1:5000/?func=refresh_hash` refreshes official and custom Malware hash rules
+* refresh_ip, `http://127.0.0.1:5000/?func=refresh_ip` refreshes official and custom IP for network monitoring
 
 ## OS supported
 Linux, MacOS and Windows are supported by Anubi engine.
@@ -78,3 +87,8 @@ During start at first time Anubi will ask for internal set up, as:
 * periodic IOC/malware scan
 * live network activities monitoring
 * particular directories hooks where IOC and malware detections will be applied at files creation/modification
+
+![Anubu init](images/anubi_init.png)
+
+## conf_anubi.py
+

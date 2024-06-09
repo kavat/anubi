@@ -116,8 +116,8 @@ def ip_checker_polling(ip_checker, iface):
     config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Error during ip_checker_polling")
     config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("ip_checker_polling() BOOM!!!")
-    config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("SNIFFER: Waiting {} for process restart".format(conf_anubi.sleep_thread_restart))
-    time.sleep(conf_anubi.sleep_thread_restart)
+    config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("SNIFFER: Waiting {} for process restart".format(config.sleep_thread_restart))
+    time.sleep(config.sleep_thread_restart)
     config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("SNIFFER: Thread restarted")
     ip_checker_polling(ip_checker, iface)
 

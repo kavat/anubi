@@ -81,3 +81,8 @@ yara_scan = YaraScan()
 hash_scan = HashScan()
 ip_check = IpCheck()
 voyeur_spy = FsSpy()
+
+buf_size_calc_hash = 65536
+
+sleep_thread_restart = 10
+sleep_thread_socket_restart = 60

@@ -44,7 +44,7 @@ def get_hash_file(file_path):
   try:
     with open(file_path, 'rb') as f:
       while True:
-        data = f.read(conf_anubi.buf_size_calc_hash)
+        data = f.read(config.buf_size_calc_hash)
         if not data:
           break
         md5.update(data)
@@ -173,14 +173,15 @@ def get_current_hours_minutes():
 
 def get_linux_dirs(dir_):
   r = []
-  p = subprocess.Popen("find / -type d -name \"{}\"".format(dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-  for line in p.stdout.readlines():
-    r.append(line.decode('ascii').rstrip())
+  for top_dir in conf_anubi.voyeur_linux_top_dirs:
+    p = subprocess.Popen("find {} -type d -name \"{}\"".format(top_dir, dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in p.stdout.readlines():
+      r.append(line.decode('ascii').rstrip())
   return r
 
 def get_macos_dirs(dir_):
   r = []
-  for top_dir in conf_anubi.mac_top_dirs:
+  for top_dir in conf_anubi.voyeur_mac_top_dirs:
     p = subprocess.Popen("find /{} -type d -name \"{}\"".format(top_dir, dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in p.stdout.readlines():
       r.append(line.decode('ascii').rstrip())

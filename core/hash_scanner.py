@@ -118,7 +118,7 @@ def hash_scanner_polling(hash_scanner, file_paths):
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during hash_scanner_polling")
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("hash_scanner_polling() BOOM!!!")
-    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Waiting {} for process restart".format(conf_anubi.sleep_thread_restart))
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Waiting {} for process restart".format(config.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Thread restarted")
     hash_scanner_polling(hash_scanner, file_paths)
