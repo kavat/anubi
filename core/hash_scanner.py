@@ -70,11 +70,20 @@ class HashScanner:
   def check(self, file_path):
     (sha1_file, sha256_file, md5_file) = get_hash_file(file_path)
     if sha1_file is not None and sha1_file in self.hash_tables:
-      return self.hash_tables[sha1_file]
+      if sha1_file not in conf_anubi.hash_whitelist:
+        return self.hash_tables[sha1_file]
+      else:
+        return ""
     if sha256_file is not None and sha256_file in self.hash_tables: 
-      return self.hash_tables[sha256_file]
+      if sha256_file not in conf_anubi.hash_whitelist:
+        return self.hash_tables[sha256_file]
+      else:
+        return ""
     if md5_file is not None and md5_file in self.hash_tables: 
-      return self.hash_tables[md5_file]
+      if md5_file not in conf_anubi.hash_whitelist:
+        return self.hash_tables[md5_file]
+      else:
+        return ""
     return ""
 
 def hash_scan_file(hash_scanner, file_path, func_orig):
@@ -114,8 +123,18 @@ def start_hash_scanner(hash_scanner, file_paths):
 def hash_scanner_polling(hash_scanner, file_paths):
   try:
     while True:
-      if get_current_hours_minutes() == config.conf_anubi['hash_hhmm']:
-        start_hash_scanner(hash_scanner, file_paths)
+      if get_current_hours_minutes() == config.conf_anubi['hash_hhmm'] or config.force_hash_scan == True:
+        if config.force_hash_scan == True:
+          if config.force_hash_scan_dirs != "":
+            config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Forced hash_scan on {}, waiting to start".format(config.force_hash_scan_dirs))
+            start_hash_scanner(hash_scanner, [config.force_hash_scan_dirs])
+            config.force_hash_scan_dirs = ""
+          else:
+            config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Forced hash_scan without dirs as argument, skipped action")
+          config.force_hash_scan = False
+        else:
+          config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Periodic hash_scan started")
+          start_hash_scanner(hash_scanner, file_paths)
       time.sleep(20)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during hash_scanner_polling")

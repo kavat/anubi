@@ -22,3 +22,12 @@ voyeur_dirs_nowild = ["/tmp"]
 
 # MAX SIZE FILE TO CHECK BY SCAN
 max_file_size = 52428800
+
+# YARA RULES WHITELIST
+yara_whitelist = ["SurtrStrings", "Surtr"]
+
+# HASH WHITELIST
+hash_whitelist = ["1ebbd3e34237af26da5dc08a4e440464"]
+
+# IP WHITELIST
+ip_whitelist = ["1.1.1.1"]

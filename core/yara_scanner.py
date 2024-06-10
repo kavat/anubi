@@ -78,7 +78,10 @@ def yara_scan_file(yara_scanner, file_path, func_orig):
       matches = yara_scanner.check(file_path)
       if matches != []:
         for found in matches:
-          config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
+          if str(found) not in conf_anubi.yara_whitelist:
+            config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
+          else:
+            config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("Rule {} matched for {} but whitelisted".format(found, file_path))
       else:
         config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
     else:
@@ -110,8 +113,18 @@ def start_yara_scanner(yara_scanner, file_paths):
 def yara_scanner_polling(yara_scanner, file_paths):
   try:
     while True:
-      if get_current_hours_minutes() == config.conf_anubi['yara_hhmm']:
-        start_yara_scanner(yara_scanner, file_paths)
+      if get_current_hours_minutes() == config.conf_anubi['yara_hhmm'] or config.force_yara_scan == True:
+        if config.force_yara_scan == True:
+          if config.force_yara_scan_dirs != "":
+            config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Forced yara_scan on {}, waiting to start".format(config.force_yara_scan_dirs))
+            start_yara_scanner(yara_scanner, [config.force_yara_scan_dirs])
+            config.force_yara_scan_dirs = ""
+          else:
+            config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Forced yara_scan without dirs as argument, skipped action")
+          config.force_yara_scan = False
+        else:
+          config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Periodic yars_scan started")
+          start_yara_scanner(yara_scanner, file_paths)
       time.sleep(20)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during yara_scanner_polling")

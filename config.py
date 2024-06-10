@@ -86,3 +86,9 @@ buf_size_calc_hash = 65536
 
 sleep_thread_restart = 10
 sleep_thread_socket_restart = 60
+
+force_yara_scan = False
+force_yara_scan_dirs = ""
+
+force_hash_scan = False
+force_hash_scan_dirs = ""

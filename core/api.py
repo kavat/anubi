@@ -1,6 +1,7 @@
 import config
 import time
 import conf_anubi
+import os
 
 from flask import (
   Flask,
@@ -14,8 +15,6 @@ app = Flask(__name__)
 def index():
   if request.method == 'GET':
     if request.args.get('func'):
-      if request.args.get('func') == 'help':
-        return "download_signatures|refresh_yara|refresh_hash|refresh_ip"
       if request.args.get('func') == 'refresh_yara':
         if config.yara_scan.get() == True:
           return "Scan in progress, no update"
@@ -42,8 +41,28 @@ def index():
           return "ok"
       if request.args.get('func') == 'download_signatures':
         return pull_rules_repo('management')
+      if request.args.get('func') == "force_yara_scan":
+        if request.args.get('dirs') is not None:
+          if os.path.isdir(request.args.get('dirs')):
+            config.force_yara_scan = True
+            config.force_yara_scan_dirs = request.args.get('dirs')
+            return "queued"
+          else:
+            return "dirs_argument_no_dir"
+        else:
+          return "no_dirs_argument"
+      if request.args.get('func') == "force_hash_scan":
+        if request.args.get('dirs') is not None:
+          if os.path.isdir(request.args.get('dirs')):
+            config.force_hash_scan = True
+            config.force_hash_scan_dirs = request.args.get('dirs')
+            return "queued"
+          else:
+            return "dirs_argument_no_dir"
+        else:
+          return "no_dirs_argument"
     else:
-      return "no_func_arg"
+      return "force_yara_scan|force_hash_scan|download_signatures|refresh_yara|refresh_hash|refresh_ip"
   else:
     return "no_get_method"
 

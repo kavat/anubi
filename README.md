@@ -32,6 +32,8 @@ Command to connect with API system `curl http://127.0.0.1:5000/?func=help` provi
 * refresh_yara, `http://127.0.0.1:5000/?func=refresh_yara` refreshes official and custom Yara rules
 * refresh_hash, `http://127.0.0.1:5000/?func=refresh_hash` refreshes official and custom Malware hash rules
 * refresh_ip, `http://127.0.0.1:5000/?func=refresh_ip` refreshes official and custom IP for network monitoring
+* force_yara_scan, `http://127.0.0.1:5000/?func=force_yara_scan&dir=url_encoded_dir` forces a yara scan (dir parameter shall be url-encoded)
+* force_hash_scan, `http://127.0.0.1:5000/?func=force_hash_scan&dir=url_encoded_dir` forces a hash scan (dir parameter shall be url-encoded)
 
 ## OS supported
 Linux, MacOS and Windows are supported by Anubi engine.
@@ -95,6 +97,8 @@ During start at first time Anubi will ask for internal set up, as:
 * particular directories hooks where IOC and malware detections will be applied at files creation/modification
 
 ![Anubu init](images/anubi_init.png)
+
+In case of error during rules loading process, only the line with error will be discarded, not the entire file.
 
 ## conf_anubi.py
 File conf_anubi.py contains personal settings usable by user to customize Anubi, as below:

@@ -46,7 +46,7 @@ class IpChecker:
             for line in f:
               try:
                 ip_tag_name = line.rstrip().split(":")[1]
-                ip_risk = line.rstrip().split(":")[2]
+                ip_risk = line.rstrip().split(":")[3]
                 if ip_tag_name != "NoTag":
                   ip_risk = 100
                 self.ip_tables[line.rstrip().split(":")[0]] = { "tag_name": ip_tag_name, "risk": ip_risk }
@@ -65,7 +65,7 @@ class IpChecker:
           with open(full_path_ip) as f:
             for line in f:
               ip_tag_name = line.rstrip().split(":")[1]
-              ip_risk = line.rstrip().split(":")[2]
+              ip_risk = line.rstrip().split(":")[3]
               self.ip_tables[line.rstrip().split(":")[0]] = { "tag_name": ip_tag_name, "risk": ip_risk }
           config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Loaded {}".format(full_path_ip))
         except Exception as e:
@@ -97,9 +97,15 @@ class IpChecker:
           sport = packet[UDP].sport
         if proto != "":
           if dst in self.ip_tables and ipaddress.ip_address(dst).is_private == False:    
-            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{} ({} with risk {})".format(dst, dport, proto, src, sport, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
+            if dst not in conf_anubi.ip_whitelist:
+              config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{} ({} with risk {})".format(dst, dport, proto, src, sport, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
+            else:
+              config.loggers["resources"]["logger_anubi_ip"].get_logger().debug("dst {}:{}/{} found from src {}:{} ({} with risk {} but whitelisted)".format(dst, dport, proto, src, sport, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
           if src in self.ip_tables and ipaddress.ip_address(src).is_private == False:
-            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{} ({} with risk {})".format(src, sport, proto, dst, dport, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
+            if src not in conf_anubi.ip_whitelist:
+              config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{} ({} with risk {})".format(src, sport, proto, dst, dport, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
+            else:
+              config.loggers["resources"]["logger_anubi_ip"].get_logger().debug("src {}:{}/{} found to dst {}:{} ({} with risk {} but whitelisted)".format(src, sport, proto, dst, dport, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
     except Exception as e:
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Error during process_sniffed_packet")
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)
