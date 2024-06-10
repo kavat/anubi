@@ -78,14 +78,17 @@ class HashScanner:
     return ""
 
 def hash_scan_file(hash_scanner, file_path, func_orig):
-  if file_exclusions(file_path) == False:
-    matches = hash_scanner.check(file_path)
-    if matches != "":
-      config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Malware {} matched for {}".format(matches, file_path))
+  try:
+    if file_exclusions(file_path) == False:
+      matches = hash_scanner.check(file_path)
+      if matches != "":
+        config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Malware {} matched for {}".format(matches, file_path))
+      else:
+        config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
     else:
-      config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
-  else:
-    config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} discarded".format(file_path))
+      config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} discarded".format(file_path))
+  except FileNotFoundError:
+    pass
 
 def start_hash_scanner(hash_scanner, file_paths):
   config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Check for updating status")

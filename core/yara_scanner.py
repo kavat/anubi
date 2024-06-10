@@ -73,15 +73,18 @@ class YaraScanner:
     return []
 
 def yara_scan_file(yara_scanner, file_path, func_orig):
-  if file_exclusions(file_path) == False:
-    matches = yara_scanner.check(file_path)
-    if matches != []:
-      for found in matches:
-        config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
+  try:
+    if file_exclusions(file_path) == False:
+      matches = yara_scanner.check(file_path)
+      if matches != []:
+        for found in matches:
+          config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
+      else:
+        config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
     else:
-      config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
-  else:
-    config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} discarded".format(file_path))
+      config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} discarded".format(file_path))
+  except FileNotFoundError:
+    pass
 
 def start_yara_scanner(yara_scanner, file_paths):
   config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Check for updating status")

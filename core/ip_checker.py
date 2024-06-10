@@ -97,9 +97,9 @@ class IpChecker:
           sport = packet[UDP].sport
         if proto != "":
           if dst in self.ip_tables and ipaddress.ip_address(dst).is_private == False:    
-            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{} ({} with risk {})".format(dst, dport, proto, src, sport, self.ip_tables[dst]["ip_tag_name"], self.ip_tables[dst]["ip_risk"]))
+            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{} ({} with risk {})".format(dst, dport, proto, src, sport, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
           if src in self.ip_tables and ipaddress.ip_address(src).is_private == False:
-            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{} ({} with risk {})".format(src, sport, proto, dst, dport, self.ip_tables[dst]["ip_tag_name"], self.ip_tables[dst]["ip_risk"]))
+            config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{} ({} with risk {})".format(src, sport, proto, dst, dport, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
     except Exception as e:
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("Error during process_sniffed_packet")
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical(e, exc_info=True)

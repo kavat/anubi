@@ -225,3 +225,9 @@ def create_anubi_struct():
         os.mkdir(config.anubi_path[dir], mode=0o755)
         if os.path.isdir(config.anubi_path[dir]) == False:
           print("{} in path {} not exists".format(dir, config.anubi_path[dir]))
+
+def is_root(): 
+  if os.geteuid()==0:
+    return 1
+  else:
+    return 0

@@ -36,9 +36,14 @@ from core.common import (
   get_voyeur_dirs,
   check_string_time,
   check_anubi_struct,
-  create_anubi_struct
+  create_anubi_struct,
+  is_root
 )
 from argparse import ArgumentParser
+
+if is_root() == 0:
+  print("Run as root")
+  sys.exit(1)
 
 parser = ArgumentParser(
                     prog='Anubi',

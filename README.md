@@ -76,6 +76,8 @@ In details, options available are the following:
 *  --start-full     used to start Anubi with configuration created (if runtime.dat is not present, it will be created before starting), rules will be downloaded or updated
 *  --wipe           used to erase Anubi logs and exit
 
+Remember to run always as **root user**!
+
 In order to start and control our assets, follow the flow below:
 * clone repo
 * install dependencies

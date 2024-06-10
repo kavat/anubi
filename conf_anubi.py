@@ -10,13 +10,14 @@ management_port = 5000
 linux_dir_exclusions = ["/proc/", "/dev/", "/sys/", "/usr/src/linux/", "/opt/yara", "/var/lib/apt/lists/"]
 
 # GENERAL EXTENSION EXCLUSIONS FROM SCAN
-extension_exclusions = [".yar", ".yara", ".h", ".pem", ".crt", ".dat", ".dat-old", ".cache", ".crash", ".db", ".log"]
+extension_exclusions = [".yar", ".yara", ".h", ".pem", ".crt", ".dat", ".dat-old", ".cache", ".crash", ".db", ".log", ".swp"]
 
-# DYNAMIC STRINGS DIRECTORY FOR FS HOOKS, USING *_top_dir VARIABLE A FIND COMMAND WILL BE EXECUTED TO OBTAIN FULL PATH INTERPOLATING TOP DIR OCCURRENCE WITH WILD DIRECTORIES
-voyeur_dirs_wild = ["download", "downloads", "Download", "Downloads", "Scaricati"]
+# DIRECTORY SET FOR FS HOOKS
+# DYNAMIC GENERATION: A FIND COMMAND IS RUN USING voyeur_linux_top_dirs ELEMENT AS PATH AND voyeur_dirs_wild AS EXPRESSION AND RESULT IS USED
+# STATIC GENERATION: voyeur_dirs_nowild IS USED DIRECTLY AS DIRECTORY
 voyeur_linux_top_dirs = ['/']
 voyeur_mac_top_dirs = []
-# STATIC STRINGS DIRECTORY FOR FS HOOKS
+voyeur_dirs_wild = ["download", "downloads", "Download", "Downloads", "Scaricati"]
 voyeur_dirs_nowild = ["/tmp"]
 
 # MAX SIZE FILE TO CHECK BY SCAN
