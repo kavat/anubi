@@ -1,0 +1,80 @@
+<html>
+  <title>Anubi</title>
+  <head>
+    <style>
+      body {font-family: Verdena}
+      td { text-align: center; min-width: 80px; padding: 3px;}
+    </style>
+    <script>
+      var URL = "http://{{host}}:{{port}}/api";
+      function exec_api(api, div_arg) {
+        var url_to_call = URL + "?func=" + api;
+        if(div_arg != "") {
+          if(api == "force_yara_scan" || api == "force_hash_scan") {
+            if(document.getElementById(div_arg).value == "") {
+              alert("Argument missed");
+              return false;
+            }
+            url_to_call = url_to_call + "&dir=" + encodeURIComponent(document.getElementById(div_arg).value);
+          }
+        }
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", url_to_call, false); // false for synchronous request
+        xmlHttp.send(null);
+        alert(xmlHttp.responseText);
+        return true;
+      }
+    </script>
+  </head>
+  <body>
+    <table cellspacing=0 cellpadding=0 border=1>
+      <tr>
+        <td>API</td>
+        <td>Description</td>
+        <td>Argument</td>
+        <td>Action</td>
+      </tr>
+      <tr>
+        <td>test</td>
+        <td>Check if API system is up</td>
+        <td> - </td>
+        <td><input onclick="exec_api('test', '');" type="button" value="RUN"></td>
+      <tr>
+        <td>force_yara_scan</td>
+        <td>Run a Yara scan on target directory using existing rules. Scan will start in the next 20 seconds</td>
+        <td><input type="text" value="" id="txt_1"></td>
+        <td><input onclick="exec_api('force_yara_scan', 'txt_1');" type="button" value="RUN"></td>
+      </tr>
+      <tr>
+        <td>force_hash_scan</td>
+        <td>Run an Hash scan on target directory using existing rules. Scan will start in the next 20 seconds</td>
+        <td><input type="text" value="" id="txt_2"></td>
+        <td><input onclick="exec_api('force_hash_scan', 'txt_2');" type="button" value="RUN"></td>
+      </tr>
+      <tr>
+        <td>download_signatures</td>
+        <td>Process to download the rules updated without reload them</td>
+        <td> - </td>
+        <td><input onclick="exec_api('download_signatures', '');" type="button" value="RUN"></td>
+      </tr>
+      <tr>
+        <td>refresh_yara</td>
+        <td>Process to reload Yara rules if no Yara scan is active</td>
+        <td> - </td>
+        <td><input onclick="exec_api('refresh_yara', '');" type="button" value="RUN"></td>
+      </tr>
+      <tr>
+        <td>refresh_hash</td>
+        <td>Process to reload Hash signatures if no Hash scan is active</td>
+        <td> - </td>
+        <td><input onclick="exec_api('refresh_hash', '');" type="button" value="RUN"></td>
+      </tr>
+      <tr>
+        <td>refresh_ip</td>
+        <td>Process to reload IP putting in queues packets</td>
+        <td> - </td>
+        <td><input onclick="exec_api('refresh_ip', '');" type="button" value="RUN"></td>
+      </tr>
+    </table>
+  </body>
+</html>

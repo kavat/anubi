@@ -8,6 +8,9 @@ import re
 import subprocess
 import psutil
 import conf_anubi
+import socket
+import string
+import random
 
 from sys import platform as _platform
 from datetime import datetime
@@ -167,6 +170,10 @@ def pull_rules_repo(thread_name):
   config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Update rules repo exit_status: {}".format(p.wait()))
   return ritorno
 
+def current_datetime():
+  now = datetime.now()
+  return now.strftime("%d/%m/%Y %H:%M:%S")
+
 def get_current_hours_minutes():
   c = datetime.now()
   return c.strftime('%H:%M')
@@ -231,3 +238,25 @@ def is_root():
     return 1
   else:
     return 0
+
+def check_tcp_conn(host, port):
+  s = socket.socket()
+  try:
+    s.connect((host, port))
+  except Exception as e: 
+    return False
+  finally:
+    s.close()
+  return True
+
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+  return ''.join(random.choice(chars) for _ in range(size))
+
+def write_report(report_filename, msg):
+  if report_filename != "":
+    try:
+      with open(report_filename, "a") as report_file:
+        report_file.write("{} - {}\n".format(current_datetime, msg))
+    except Exception as e:
+      print("Unable to write {}".format(report_filename))
+  return True

@@ -27,13 +27,13 @@ Scan is an active monitoring on the filesystem directories specified (as default
 
 ### API
 Anubi helps users with its own API system used to interact. 
-Command to connect with API system `curl http://127.0.0.1:5000/?func=help` provides available references:
-* download_signatures, `http://127.0.0.1:5000/?func=download_signatures` allows pulling from anubi-signatures repository for rules update without reload them in Anubi
-* refresh_yara, `http://127.0.0.1:5000/?func=refresh_yara` refreshes official and custom Yara rules
-* refresh_hash, `http://127.0.0.1:5000/?func=refresh_hash` refreshes official and custom Malware hash rules
-* refresh_ip, `http://127.0.0.1:5000/?func=refresh_ip` refreshes official and custom IP for network monitoring
-* force_yara_scan, `http://127.0.0.1:5000/?func=force_yara_scan&dir=url_encoded_dir` forces a yara scan (dir parameter shall be url-encoded)
-* force_hash_scan, `http://127.0.0.1:5000/?func=force_hash_scan&dir=url_encoded_dir` forces a hash scan (dir parameter shall be url-encoded)
+Command to connect with API system `curl http://127.0.0.1:5000/api?func=help` provides available references:
+* download_signatures, `http://127.0.0.1:5000/api?func=download_signatures` allows pulling from anubi-signatures repository for rules update without reload them in Anubi
+* refresh_yara, `http://127.0.0.1:5000/api?func=refresh_yara` refreshes official and custom Yara rules
+* refresh_hash, `http://127.0.0.1:5000/api?func=refresh_hash` refreshes official and custom Malware hash rules
+* refresh_ip, `http://127.0.0.1:5000/api?func=refresh_ip` refreshes official and custom IP for network monitoring
+* force_yara_scan, `http://127.0.0.1:5000/api?func=force_yara_scan&dir=url_encoded_dir` forces a yara scan (dir parameter shall be url-encoded)
+* force_hash_scan, `http://127.0.0.1:5000/api?func=force_hash_scan&dir=url_encoded_dir` forces a hash scan (dir parameter shall be url-encoded)
 
 ## OS supported
 Linux, MacOS and Windows are supported by Anubi engine.

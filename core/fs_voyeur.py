@@ -49,7 +49,7 @@ class FsVoyeurEvent(LoggingEventHandler):
           config.yara_scan.set(True)
           try:
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Starting yara scanning on {}".format(event.src_path))
-            yara_scan_file(self.yara_scanner, event.src_path, 'voyeur')
+            yara_scan_file(self.yara_scanner, event.src_path, 'voyeur', '')
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Finished yara scanning on {}".format(event.src_path))
           except Exception as e:
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Exception during yara_voyeur on {}".format(event.src_path))
@@ -62,7 +62,7 @@ class FsVoyeurEvent(LoggingEventHandler):
           config.hash_scan.set(True)
           try:
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Starting hash scanning on {}".format(event.src_path))
-            hash_scan_file(self.hash_scanner, event.src_path, 'voyeur')
+            hash_scan_file(self.hash_scanner, event.src_path, 'voyeur', '')
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Finished hash scanning on {}".format(event.src_path))
           except Exception as e:
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Exception during hash_voyeur scan on {}".format(event.src_path))

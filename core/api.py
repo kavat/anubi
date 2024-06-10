@@ -5,16 +5,23 @@ import os
 
 from flask import (
   Flask,
-  request
+  request,
+  render_template
 )
-from core.common import pull_rules_repo
+from core.common import pull_rules_repo, check_tcp_conn
 
 app = Flask(__name__)
 
 @app.route("/", methods=['GET'])
 def index():
+  return render_template('index.html', host=conf_anubi.management_host, port=conf_anubi.management_port)
+
+@app.route("/api", methods=['GET'])
+def api():
   if request.method == 'GET':
     if request.args.get('func'):
+      if request.args.get('func') == 'test':
+        return "AM I LORD VOLDEMORT"
       if request.args.get('func') == 'refresh_yara':
         if config.yara_scan.get() == True:
           return "Scan in progress, no update"
@@ -62,7 +69,7 @@ def index():
         else:
           return "no_dir_argument"
     else:
-      return "force_yara_scan|force_hash_scan|download_signatures|refresh_yara|refresh_hash|refresh_ip"
+      return "test|force_yara_scan|force_hash_scan|download_signatures|refresh_yara|refresh_hash|refresh_ip"
   else:
     return "no_get_method"
 

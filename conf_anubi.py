@@ -31,3 +31,7 @@ hash_whitelist = ["1ebbd3e34237af26da5dc08a4e440464"]
 
 # IP WHITELIST
 ip_whitelist = ["1.1.1.1"]
+
+# SUFFIX REPORT NAMES
+yara_report_suffix = "yara"
+hash_report_suffix = "hash"
