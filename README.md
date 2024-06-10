@@ -104,3 +104,8 @@ In case of error during rules loading process, only the line with error will be 
 File conf_anubi.py contains personal settings usable by user to customize Anubi, as below:
 
 ![conf_anubi.py](images/conf_anubi.png)
+
+## Scan process
+Periodical or on-demand scans are executed parallel and output can be visualized at screen or in specific file in path reports
+
+![Anubi scan](images/anubi_run.png)
