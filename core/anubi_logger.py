@@ -1,11 +1,12 @@
 import config
 import logging
 import sys
+import os
 
 class AnubiLogger:
 
   def __init__(self, nome_log, path_log, log_std, log_level):
-    self.path_log = path_log
+    self.path_log = self.create_log_path(path_log)
     self.nome_log = nome_log
     self.log_std = log_std
     self.logger = logging.getLogger(self.nome_log)
@@ -23,6 +24,11 @@ class AnubiLogger:
     self.logger.addHandler(file_handler)
     if self.log_std == True:
       self.logger.addHandler(stdout_handler)
+
+  def create_log_path(self, path_log):
+    if os.path.isdir(os.path.dirname(path_log)) == False:
+      os.mkdir(os.path.dirname(path_log))
+    return path_log
 
   def wipe(self):
     file_handler = logging.FileHandler(self.path_log, 'w')

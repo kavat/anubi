@@ -42,25 +42,25 @@ def index():
       if request.args.get('func') == 'download_signatures':
         return pull_rules_repo('management')
       if request.args.get('func') == "force_yara_scan":
-        if request.args.get('dirs') is not None:
-          if os.path.isdir(request.args.get('dirs')):
+        if request.args.get('dir') is not None:
+          if os.path.isdir(request.args.get('dir')):
             config.force_yara_scan = True
-            config.force_yara_scan_dirs = request.args.get('dirs')
+            config.force_yara_scan_dirs = request.args.get('dir')
             return "queued"
           else:
-            return "dirs_argument_no_dir"
+            return "dir_argument_no_dir"
         else:
-          return "no_dirs_argument"
+          return "no_dir_argument"
       if request.args.get('func') == "force_hash_scan":
-        if request.args.get('dirs') is not None:
-          if os.path.isdir(request.args.get('dirs')):
+        if request.args.get('dir') is not None:
+          if os.path.isdir(request.args.get('dir')):
             config.force_hash_scan = True
-            config.force_hash_scan_dirs = request.args.get('dirs')
+            config.force_hash_scan_dirs = request.args.get('dir')
             return "queued"
           else:
-            return "dirs_argument_no_dir"
+            return "dir_argument_no_dir"
         else:
-          return "no_dirs_argument"
+          return "no_dir_argument"
     else:
       return "force_yara_scan|force_hash_scan|download_signatures|refresh_yara|refresh_hash|refresh_ip"
   else:
