@@ -99,4 +99,4 @@ During start at first time Anubi will ask for internal set up, as:
 ## conf_anubi.py
 File conf_anubi.py contains personal settings usable by user to customize Anubi, as below:
 
-![conf_anubi.py](images/anubi_conf.png)
+![conf_anubi.py](images/conf_anubi.png)
