@@ -59,6 +59,10 @@ External dependencies are needed:
 
 Relating di Pip modules, install dependecies through `pip install -r pip_requirements.txt`
 
+**Attention**: running Anubu after dependencies installation error as 
+`yara.SyntaxError: ......./anubi/conf/anubi-signatures/yara/RANSOM_BadRabbit.yar(35): invalid field name "imphash"`
+can appear: this happen because yara-python or yara needs to be installed after or with the compilation support of other libraries, such libssl-dev
+
 ## Run
 Anubi is developed to be run on Linux and further release will provides same functions on Windows and Mac.
 
@@ -93,4 +97,6 @@ During start at first time Anubi will ask for internal set up, as:
 ![Anubu init](images/anubi_init.png)
 
 ## conf_anubi.py
+File conf_anubi.py contains personal settings usable by user to customize Anubi, as below:
 
+![conf_anubi.py](images/anubi_conf.png)
