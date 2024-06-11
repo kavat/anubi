@@ -24,28 +24,28 @@ def api():
         return "AM I LORD VOLDEMORT"
       if request.args.get('func') == 'refresh_yara':
         if config.yara_scan.get() == True:
-          return "Scan in progress, no update"
+          return "Yara scan in progress, can not update"
         else:
           config.updater_yara.set_updating(True)
           config.scanners['yara_scanner'].load_rules()
           config.updater_yara.set_updating(False)
-          return "ok"
+          return "Reloaded"
       if request.args.get('func') == 'refresh_hash':
         if config.hash_scan.get() == True:
-          return "Scan in progress, no update"
+          return "Hash scan in progress, can not update"
         else:
           config.updater_hash.set_updating(True)
           config.scanners['hash_scanner'].load_rules()
           config.updater_hash.set_updating(False)
-          return "ok"
+          return "Reloaded"
       if request.args.get('func') == 'refresh_ip':
         if config.ip_check.get() == True:
-          return "Scan in progress, no update"
+          return "Ip analysis in progress, can not update"
         else:
           config.updater_ip.set_updating(True)
           config.scanners['ip_checker'].load_rules()
           config.updater_ip.set_updating(False)
-          return "ok"
+          return "Reloaded"
       if request.args.get('func') == 'download_signatures':
         return pull_rules_repo('management')
       if request.args.get('func') == "force_yara_scan":
@@ -53,21 +53,21 @@ def api():
           if os.path.isdir(request.args.get('dir')):
             config.force_yara_scan = True
             config.force_yara_scan_dirs = request.args.get('dir')
-            return "queued"
+            return "Queued, waiting for start"
           else:
-            return "dir_argument_no_dir"
+            return "Directory {} not available".format(request.args.get('dir'))
         else:
-          return "no_dir_argument"
+          return "Parameter directory missed"
       if request.args.get('func') == "force_hash_scan":
         if request.args.get('dir') is not None:
           if os.path.isdir(request.args.get('dir')):
             config.force_hash_scan = True
             config.force_hash_scan_dirs = request.args.get('dir')
-            return "queued"
+            return "Queued, waiting for start"
           else:
-            return "dir_argument_no_dir"
+            return "Directory {} not available".format(request.args.get('dir'))
         else:
-          return "no_dir_argument"
+          return "Parameter directory missed"
     else:
       return "test|force_yara_scan|force_hash_scan|download_signatures|refresh_yara|refresh_hash|refresh_ip"
   else:

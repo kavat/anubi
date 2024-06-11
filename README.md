@@ -1,29 +1,29 @@
 # Anubi
-IOC/Hash scanner and IDS layer 4 designed to be portable and fast
+IOC/Hash scanner and IDS layer 4 portable and fast
 
-Anubi is a tool desgined and written in Python in order to be flexible and usable on different platform.
+Anubi is a tool designed and written in Python in order to be flexible and usable on different platforms.
 
 ## Functions
-Anubi combines four different engines to check your assets:
+Anubi combines 5 different engines to check your assets:
 1. IOC scanner
 2. Hash scanner
 3. IP check
-4. Filesystem modifications
+4. Filesystem modifications (Voyeur)
 5. API
 
-These functionalities use a prepared set of rules available in [my repository](https://github.com/kavat/anubi-signatures) generated daily.
+These functionalities use a prepared set of rules available in [my repository](https://github.com/kavat/anubi-signatures) generated daily; even custom rules can be loaded.
 
 ### IOC scanner
-Scan is a passive monitoring on the filesystem root applying Yara rules generated in [my official repo](https://github.com/kavat/anubi-signatures/tree/main/yara)
+IOC scan is a passive monitoring on the filesystem root applying Yara rules generated in [my official repo](https://github.com/kavat/anubi-signatures/tree/main/yara)
 
 ### Hash scanner
-Scan is a passive monitoring on the filesystem root applying Hash rules generated in [my official repo](https://github.com/kavat/anubi-signatures/tree/main/hash)
+Hash scan is a passive monitoring on the filesystem root applying Hash rules generated in [my official repo](https://github.com/kavat/anubi-signatures/tree/main/hash)
 
 ### IP checker
-Scan is a passive monitoring on the filesystem root applying IP rules generated in [my official repo](https://github.com/kavat/anubi-signatures/tree/main/ip)
+IP checker is an active monitoring of a particular ethernet interface applying IP rules generated in [my official repo](https://github.com/kavat/anubi-signatures/tree/main/ip)
 
-### Filesystem modifications
-Scan is an active monitoring on the filesystem directories specified (as default system tries to identify Downlaods and media such USB) applying previously [Yara](https://github.com/kavat/anubi-signatures/tree/main/yara) and [Hash](https://github.com/kavat/anubi-signatures/tree/main/hash) rules
+### Filesystem modifications (Voyeur)
+Voyeur is an active monitoring on the filesystem directories specified applying [Yara](https://github.com/kavat/anubi-signatures/tree/main/yara) and [Hash](https://github.com/kavat/anubi-signatures/tree/main/hash) rules
 
 ### API
 Anubi helps users with its own API system used to interact. 
@@ -35,8 +35,12 @@ Command to connect with API system `curl http://127.0.0.1:5000/api?func=help` pr
 * force_yara_scan, `http://127.0.0.1:5000/api?func=force_yara_scan&dir=url_encoded_dir` forces a yara scan (dir parameter shall be url-encoded)
 * force_hash_scan, `http://127.0.0.1:5000/api?func=force_hash_scan&dir=url_encoded_dir` forces a hash scan (dir parameter shall be url-encoded)
 
+User is helped by a simply webui in order to interact with Anubi (as default console is reacheable at http://127.0.0.:5000)
+
+![Anubu WebUI](images/webui.png)
+
 ## OS supported
-Linux, MacOS and Windows are supported by Anubi engine.
+Linux and MacOS are supported by Anubi; Windows will be soon.
 
 ## Dependencies
 External dependencies are needed:
@@ -59,14 +63,14 @@ External dependencies are needed:
   * Linux/Windows: follow [official documentation](https://yara.readthedocs.io/en/stable/gettingstarted.html) 
   * MacOS: `brew install yara`
 
-Relating di Pip modules, install dependecies through `pip install -r pip_requirements.txt`
+Relating to Pip modules, user can install dependecies through `pip install -r pip_requirements.txt`
 
-**Attention**: running Anubu after dependencies installation error as 
+**Attention**: running Anubu some errors can appear, as below
 `yara.SyntaxError: ......./anubi/conf/anubi-signatures/yara/RANSOM_BadRabbit.yar(35): invalid field name "imphash"`
-can appear: this happen because yara-python or yara needs to be installed after or with the compilation support of other libraries, such libssl-dev
+this happen because yara-python or yara needs to be installed after or with the compilation support of other libraries, such libssl-dev for this particular case
 
 ## Run
-Anubi is developed to be run on Linux and further release will provides same functions on Windows and Mac.
+Anubi is developed to be run on Linux and Mac, further release will provides same functions on Windows.
 
 In order to print full options, run Anubi with --help; the following options will be returned:
 
@@ -82,7 +86,7 @@ In details, options available are the following:
 *  --start-full     used to start Anubi with configuration created (if runtime.dat is not present, it will be created before starting), rules will be downloaded or updated
 *  --wipe           used to erase Anubi logs and exit
 
-Remember to run always as **root user**!
+Remember to run always as **root** user!
 
 In order to start and control our assets, follow the flow below:
 * clone repo
@@ -91,10 +95,10 @@ In order to start and control our assets, follow the flow below:
 * run Anubi with --init to create the configuration for periodic scan
 * run Anubi with --start-full
 
-During start at first time Anubi will ask for internal set up, as:
+During first time start Anubi will ask for its internal set up, as:
 * periodic IOC/malware scan
 * live network activities monitoring
-* particular directories hooks where IOC and malware detections will be applied at files creation/modification
+* particular directories hooks where IOC and malware detections will started on file creation/modification events.
 
 ![Anubu init](images/anubi_init.png)
 
