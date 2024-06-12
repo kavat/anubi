@@ -1,6 +1,8 @@
 # Anubi
 IOC/Hash scanner and IDS layer 4 portable and fast
 
+![Anubu logo](images/anubi_logo.png)
+
 Anubi is a tool designed and written in Python in order to be flexible and usable on different platforms.
 
 ## Functions
