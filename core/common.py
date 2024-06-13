@@ -174,6 +174,10 @@ def current_datetime():
   now = datetime.now()
   return now.strftime("%d/%m/%Y %H:%M:%S")
 
+def current_date():
+  now = datetime.now()
+  return now.strftime("%Y-%m-%d")
+
 def get_current_hours_minutes():
   c = datetime.now()
   return c.strftime('%H:%M')
@@ -219,6 +223,7 @@ def check_anubi_struct():
         if os.path.isfile(config.anubi_path[dir]) == True:
           print("File {} in path {} exists".format(dir, config.anubi_path[dir]))
         else:
+          print("Directory or file {} in path {} does not exists".format(dir, config.anubi_path[dir]))
           ritorno = False
   return ritorno
 
@@ -256,7 +261,16 @@ def write_report(report_filename, msg):
   if report_filename != "":
     try:
       with open(report_filename, "a") as report_file:
-        report_file.write("{} - {}\n".format(current_datetime, msg))
+        report_file.write("{} - {}\n".format(current_datetime(), msg))
     except Exception as e:
       print("Unable to write {}".format(report_filename))
+  return True
+
+def write_stats(func_name, msg):
+  report_filename = "{}/{}_{}.stat".format(config.anubi_path['stats_path'], func_name, current_date())
+  try:
+    with open(report_filename, "a") as report_file:
+      report_file.write("{} - {}\n".format(current_datetime(), msg))
+  except Exception as e:
+    print("Unable to write {}".format(report_filename))
   return True

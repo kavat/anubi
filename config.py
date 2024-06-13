@@ -36,6 +36,7 @@ anubi_path = {
   "custom_ip_path": "{}/conf/custom_ip".format(application_path),
   "log_path": "{}/log".format(application_path),
   "report_path": "{}/reports".format(application_path),
+  "stats_path": "{}/stats".format(application_path),
   "configfile_path": "{}/conf/runtime.dat".format(application_path)
 }
 

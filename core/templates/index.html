@@ -6,6 +6,7 @@
       td { text-align: center; min-width: 80px; padding: 3px;}
       .left {float: left;}
       div {width: 9px;}
+      #output {width: 100% !important;}
     </style>
     <script>
       var URL = "http://{{host}}:{{port}}/api";
@@ -19,11 +20,23 @@
             }
             url_to_call = url_to_call + "&dir=" + encodeURIComponent(document.getElementById(div_arg).value);
           }
+          if(api == "report") {
+            if(document.getElementById(div_arg).value == "") {
+              alert("Argument missed");
+              return false;
+            }
+            url_to_call = url_to_call + "&type=" + document.getElementById(div_arg).value;
+          }
         }
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open("GET", url_to_call, false); // false for synchronous request
         xmlHttp.send(null);
-        alert(xmlHttp.responseText);
+        if(api == "report" || api == "download_signatures") {
+          document.getElementById('output').innerHTML = xmlHttp.responseText;
+        }
+        else {
+          alert(xmlHttp.responseText);
+        }
         return true;
       }
     </script>
@@ -80,6 +93,14 @@
         <td> - </td>
         <td><input onclick="exec_api('refresh_ip', '');" type="button" value="RUN"></td>
       </tr>
+     <tr>
+        <td>report</td>
+        <td>Report for type</td>
+        <td><select id='select_1'><option value="yara">yara</option><option value="hash">hash</option><option value="ips">ips</option><option value="voyeur">voyeur</option></select></td>
+        <td><input onclick="exec_api('report', 'select_1');" type="button" value="RUN"></td>
+      </tr>
     </table>
+    <br><br><br><br><br>
+    <div id='output'></div>
   </body>
 </html>

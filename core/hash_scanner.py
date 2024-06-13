@@ -15,7 +15,8 @@ from core.common import (
   pull_rules_repo,
   get_current_hours_minutes,
   id_generator,
-  write_report
+  write_report,
+  write_stats
 )
 
 class HashScan:
@@ -95,6 +96,7 @@ def hash_scan_file(hash_scanner, file_path, func_orig, report_filename):
       if matches != "":
         config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Malware {} matched for {}".format(matches, file_path))
         write_report(report_filename, "Malware {} matched for {}".format(matches, file_path))
+        write_stats(func_orig, "Malware {} matched for {}".format(matches, file_path))
       else:
         config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
         write_report(report_filename, "{} cleaned".format(file_path))

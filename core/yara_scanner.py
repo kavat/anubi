@@ -14,7 +14,8 @@ from core.common import (
   pull_rules_repo,
   get_current_hours_minutes,
   id_generator,
-  write_report
+  write_report,
+  write_stats
 )
 
 class YaraScan:
@@ -47,6 +48,8 @@ class YaraScanner:
           yara.compile(full_path_rule)
           config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Loaded {}".format(full_path_rule))
           rules[full_path_rule] = full_path_rule
+        except yara.SyntaxError as ey:
+          config.loggers["resources"]["logger_anubi_yara"].get_logger().warn("Error on {}: {}, skipped".format(full_path_rule, ey))
         except Exception as e:
           config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
           config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("yara load_rules() BOOM!!!")
@@ -83,6 +86,7 @@ def yara_scan_file(yara_scanner, file_path, func_orig, report_filename):
           if str(found) not in conf_anubi.yara_whitelist:
             config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
             write_report(report_filename, "Rule {} matched for {}".format(found, file_path))
+            write_stats(func_orig, "Rule {} matched for {}".format(found, file_path))
           else:
             config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("Rule {} matched for {} but whitelisted".format(found, file_path))
             write_report(report_filename, "Rule {} matched for {} but whitelisted".format(found, file_path))

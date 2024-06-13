@@ -13,7 +13,8 @@ from scapy.all import *
 from core.common import (
   wait_for_updating,
   file_exclusions,
-  pull_rules_repo
+  pull_rules_repo,
+  write_stats
 )
 
 class IpCheck:
@@ -99,11 +100,13 @@ class IpChecker:
           if dst in self.ip_tables and ipaddress.ip_address(dst).is_private == False:    
             if dst not in conf_anubi.ip_whitelist:
               config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{} ({} with risk {})".format(dst, dport, proto, src, sport, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
+              write_stats('ips', "src={}:{}/{} -> dst={}:{}/{} (name: {}, risk: {})".format(src, sport, proto, dst, dport, proto, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
             else:
               config.loggers["resources"]["logger_anubi_ip"].get_logger().debug("dst {}:{}/{} found from src {}:{} ({} with risk {} but whitelisted)".format(dst, dport, proto, src, sport, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
           if src in self.ip_tables and ipaddress.ip_address(src).is_private == False:
             if src not in conf_anubi.ip_whitelist:
               config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{} ({} with risk {})".format(src, sport, proto, dst, dport, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
+              write_stats('ips', "src={}:{}/{} -> dst={}:{}/{} (name: {}, risk: {})".format(src, sport, proto, dst, dport, proto, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
             else:
               config.loggers["resources"]["logger_anubi_ip"].get_logger().debug("src {}:{}/{} found to dst {}:{} ({} with risk {} but whitelisted)".format(src, sport, proto, dst, dport, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
     except Exception as e:

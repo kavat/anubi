@@ -8,7 +8,12 @@ from flask import (
   request,
   render_template
 )
-from core.common import pull_rules_repo, check_tcp_conn
+from core.common import (
+  pull_rules_repo, 
+  check_tcp_conn, 
+  current_date
+)
+from pathlib import Path
 
 app = Flask(__name__)
 
@@ -68,8 +73,19 @@ def api():
             return "Directory {} not available".format(request.args.get('dir'))
         else:
           return "Parameter directory missed"
+      if request.args.get('func') == "report":
+        if request.args.get('type') is not None:
+          try:
+            report_filename = "{}/{}_{}.stat".format(config.anubi_path['stats_path'], request.args.get('type'), current_date())
+            return Path(report_filename).read_text().replace('\n', '<br>')
+          except FileNotFoundError:
+            return "No stats returned for {}".format(request.args.get('type'))
+          except Exception as e:
+            return e
+        else:
+          return "Parameter type missed"
     else:
-      return "test|force_yara_scan|force_hash_scan|download_signatures|refresh_yara|refresh_hash|refresh_ip"
+      return "report|test|force_yara_scan|force_hash_scan|download_signatures|refresh_yara|refresh_hash|refresh_ip"
   else:
     return "no_get_method"
 
