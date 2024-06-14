@@ -13,11 +13,13 @@ from core.anubi_thread import (
 )
 from core.yara_scanner import (
   YaraScanner,
-  yara_scanner_polling
+  yara_scanner_polling,
+  yara_scanner_periodic_polling
 )
 from core.hash_scanner import (
   HashScanner,
-  hash_scanner_polling
+  hash_scanner_polling,
+  hash_scanner_periodic_polling
 )
 from core.ip_checker import (
   IpChecker,
@@ -109,10 +111,29 @@ if args.start == True or args.start_full == True:
     config.scanners['hash_scanner'] = HashScanner()
     config.scanners['ip_checker'] = IpChecker()
 
-    config.threads["yara"] = AnubiThread("yara", yara_scanner_polling, (config.scanners['yara_scanner'],['/'],))
-    config.threads["hash"] = AnubiThread("hash", hash_scanner_polling, (config.scanners['hash_scanner'],['/'],))
+    if 'yara' in config.conf_anubi and config.conf_anubi['yara'] == 'Y':
+      if check_string_time(config.conf_anubi['yara_hhmm']) == True:
+        config.loggers["resources"]["logger_anubi_main"].get_logger().info("Periodic yara_scanner enabled")
+        config.threads["yara_periodic"] = AnubiThread("yara_periodic", yara_scanner_periodic_polling, (config.scanners['yara_scanner'],['/'],))
+      else:
+        config.loggers["resources"]["logger_anubi_main"].get_logger().warning("Periodic yara_scanner enabled without hours:minutes parameter, skipped")
+    else:
+      config.loggers["resources"]["logger_anubi_main"].get_logger().warning("Periodic yara_scanner not enabled")
+
+    if 'hash' in config.conf_anubi and config.conf_anubi['hash'] == 'Y':
+      if check_string_time(config.conf_anubi['hash_hhmm']) == True:
+        config.loggers["resources"]["logger_anubi_main"].get_logger().info("Periodic hash_scanner enabled")
+        config.threads["hash_periodic"] = AnubiThread("hash_periodic", hash_scanner_periodic_polling, (config.scanners['hash_scanner'],['/'],))
+      else:
+        config.loggers["resources"]["logger_anubi_main"].get_logger().warning("Periodic hash_scanner enabled without hours:minutes parameter, skipped")
+    else:
+      config.loggers["resources"]["logger_anubi_main"].get_logger().warning("Periodic hash_scanner not enabled")
+
+    config.threads["yara"] = AnubiThread("yara", yara_scanner_polling, (config.scanners['yara_scanner'],))
+    config.threads["hash"] = AnubiThread("hash", hash_scanner_polling, (config.scanners['hash_scanner'],))
 
     if 'ip' in config.conf_anubi and config.conf_anubi['ip'] == 'Y':
+      config.loggers["resources"]["logger_anubi_main"].get_logger().info("IP checker enabled")
       config.threads["ip"] = AnubiThread("ip", ip_checker_polling, (config.scanners['ip_checker'],config.conf_anubi['eth'],))
     else:
       config.loggers["resources"]["logger_anubi_main"].get_logger().warning("IP checker not enabled")

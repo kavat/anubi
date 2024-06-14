@@ -127,22 +127,35 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
   config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Hash scan finished")
   config.hash_scan.set(False)
 
-def hash_scanner_polling(hash_scanner, file_paths):
+def hash_scanner_periodic_polling(hash_scanner, file_paths):
   try:
     while True:
-      if ('hash' in config.conf_anubi and config.conf_anubi['hash'] == 'Y' and get_current_hours_minutes() == config.conf_anubi['hash_hhmm']) or config.force_hash_scan == True:
-        report_filename = "{}/{}_{}.report".format(config.anubi_path['report_path'], conf_anubi.hash_report_suffix, id_generator(10))
-        if config.force_hash_scan == True:
-          if config.force_hash_scan_dirs != "":
-            config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Forced hash_scan on {}, waiting to start".format(config.force_hash_scan_dirs))
-            start_hash_scanner(hash_scanner, [config.force_hash_scan_dirs], report_filename)
-            config.force_hash_scan_dirs = ""
-          else:
-            config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Forced hash_scan without dirs as argument, skipped action")
-          config.force_hash_scan = False
+      report_filename = "{}/{}_{}.report".format(config.anubi_path['report_path'], conf_anubi.hash_report_suffix, id_generator(10))
+      if get_current_hours_minutes() == config.conf_anubi['hash_hhmm']:
+        config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Periodic hash_scan started")
+        start_hash_scanner(hash_scanner, file_paths, report_filename)
+      time.sleep(20)
+  except Exception as e:
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during hash_scanner_periodic_polling")
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
+    config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("hash_scanner_periodic_polling() BOOM!!!")
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Waiting {} for process restart".format(config.sleep_thread_restart))
+    time.sleep(config.sleep_thread_restart)
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Thread restarted")
+    hash_scanner_periodic_polling(hash_scanner, file_paths)
+
+def hash_scanner_polling(hash_scanner):
+  try:
+    while True:
+      report_filename = "{}/{}_{}.report".format(config.anubi_path['report_path'], conf_anubi.hash_report_suffix, id_generator(10))
+      if config.force_hash_scan == True:
+        if config.force_hash_scan_dirs != "":
+          config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Forced hash_scan on {}, waiting to start".format(config.force_hash_scan_dirs))
+          start_hash_scanner(hash_scanner, [config.force_hash_scan_dirs], report_filename)
+          config.force_hash_scan_dirs = ""
         else:
-          config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Periodic hash_scan started")
-          start_hash_scanner(hash_scanner, file_paths, report_filename)
+          config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Forced hash_scan without dirs as argument, skipped action")
+        config.force_hash_scan = False
       time.sleep(20)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during hash_scanner_polling")
@@ -151,5 +164,4 @@ def hash_scanner_polling(hash_scanner, file_paths):
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Waiting {} for process restart".format(config.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Thread restarted")
-    hash_scanner_polling(hash_scanner, file_paths)
-
+    hash_scanner_polling(hash_scanner)

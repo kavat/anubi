@@ -56,7 +56,7 @@ def get_hash_file(file_path):
 
     return (sha1.hexdigest(), sha256.hexdigest(), md5.hexdigest())
   except Exception as e:
-    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during {} hash calc".format(file_path))
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during {} hash calc: {}".format(file_path, e))
   return (None, None, None)
 
 def file_exclusions(file_path):
