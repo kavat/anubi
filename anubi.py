@@ -109,22 +109,8 @@ if args.start == True or args.start_full == True:
     config.scanners['hash_scanner'] = HashScanner()
     config.scanners['ip_checker'] = IpChecker()
 
-    if 'yara' in config.conf_anubi and config.conf_anubi['yara'] == 'Y':
-      if check_string_time(config.conf_anubi['yara_hhmm']) == True:
-        config.threads["yara"] = AnubiThread("yara", yara_scanner_polling, (config.scanners['yara_scanner'],['/'],))
-      else:
-        config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Yara scanner enabled but invalid hh:mm param: {}".format(config.conf_anubi['yara_hhmm']))
-    else:
-      config.loggers["resources"]["logger_anubi_main"].get_logger().warning("Yara scanner not enabled")
-  
-    if 'hash' in config.conf_anubi and config.conf_anubi['hash'] == 'Y':
-      if check_string_time(config.conf_anubi['hash_hhmm']) == True:
-        config.threads["hash"] = AnubiThread("hash", hash_scanner_polling, (config.scanners['hash_scanner'],['/'],))
-      else:
-        config.loggers["resources"]["logger_anubi_hash"].get_logger().error("Hash scanner enabled but invalid hh:mm param: {}".format(config.conf_anubi['hash_hhmm']))
-        sys.exit(1)
-    else:
-      config.loggers["resources"]["logger_anubi_main"].get_logger().warning("Hash scanner not enabled")
+    config.threads["yara"] = AnubiThread("yara", yara_scanner_polling, (config.scanners['yara_scanner'],['/'],))
+    config.threads["hash"] = AnubiThread("hash", hash_scanner_polling, (config.scanners['hash_scanner'],['/'],))
 
     if 'ip' in config.conf_anubi and config.conf_anubi['ip'] == 'Y':
       config.threads["ip"] = AnubiThread("ip", ip_checker_polling, (config.scanners['ip_checker'],config.conf_anubi['eth'],))

@@ -130,7 +130,7 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
 def hash_scanner_polling(hash_scanner, file_paths):
   try:
     while True:
-      if get_current_hours_minutes() == config.conf_anubi['hash_hhmm'] or config.force_hash_scan == True:
+      if ('hash' in config.conf_anubi and config.conf_anubi['hash'] == 'Y' and get_current_hours_minutes() == config.conf_anubi['hash_hhmm']) or config.force_hash_scan == True:
         report_filename = "{}/{}_{}.report".format(config.anubi_path['report_path'], conf_anubi.hash_report_suffix, id_generator(10))
         if config.force_hash_scan == True:
           if config.force_hash_scan_dirs != "":

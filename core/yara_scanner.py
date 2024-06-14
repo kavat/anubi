@@ -123,7 +123,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
 def yara_scanner_polling(yara_scanner, file_paths):
   try:
     while True:
-      if get_current_hours_minutes() == config.conf_anubi['yara_hhmm'] or config.force_yara_scan == True:
+      if ('yara' in config.conf_anubi and config.conf_anubi['yara'] == 'Y' and get_current_hours_minutes() == config.conf_anubi['yara_hhmm']) or config.force_yara_scan == True:
         report_filename = "{}/{}_{}.report".format(config.anubi_path['report_path'], conf_anubi.yara_report_suffix, id_generator(10))
         if config.force_yara_scan == True:
           if config.force_yara_scan_dirs != "":
