@@ -116,3 +116,14 @@ File conf_anubi.py contains personal settings usable by user to customize Anubi,
 Periodical or on-demand scans are executed parallel and output can be visualized at screen or in specific file in path reports
 
 ![Anubi scan](images/anubi_run.png)
+
+## Whitelisting
+Anubi allows to whitelist:
+* Yara rules
+* Hash
+* IP
+
+only adding them in conf_anubi.py in specific whitelist:
+* Yara rules specified by name (example Certutil_Decode_OR_Download) in yara_whitelist
+* Hash (example 1ebbd3e34237af26da5dc08a4e440464) in hash_whitelist
+* IP (example 1.1.1.1) in ip_whitelist
