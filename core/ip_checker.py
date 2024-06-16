@@ -13,7 +13,7 @@ from scapy.all import *
 from core.common import (
   wait_for_updating,
   file_exclusions,
-  pull_rules_repo,
+  id_generator,
   write_stats
 )
 
@@ -35,7 +35,6 @@ class IpChecker:
     if os.path.isdir(config.anubi_path['ip_path']) == False and os.path.isdir(config.anubi_path['custom_ip_path']):
       config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("{} not found, exit".format(config.anubi_path['ip_path']))
       sys.exit(1)
-    #pull_rules_repo('ip')
     self.load_rules()
 
   def load_rules(self):
@@ -101,12 +100,14 @@ class IpChecker:
             if dst not in conf_anubi.ip_whitelist:
               config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{} ({} with risk {})".format(dst, dport, proto, src, sport, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
               write_stats('ips', "src={}:{}/{} -> dst={}:{}/{} (name: {}, risk: {})".format(src, sport, proto, dst, dport, proto, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
+              config.msgbox[id_generator(10)] = {"title": "Evil IP destination detected", "msg": "Traffic to {} ({}) with risk {} detected, check logs".format(dst, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"])}
             else:
               config.loggers["resources"]["logger_anubi_ip"].get_logger().debug("dst {}:{}/{} found from src {}:{} ({} with risk {} but whitelisted)".format(dst, dport, proto, src, sport, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
           if src in self.ip_tables and ipaddress.ip_address(src).is_private == False:
             if src not in conf_anubi.ip_whitelist:
               config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{} ({} with risk {})".format(src, sport, proto, dst, dport, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
               write_stats('ips', "src={}:{}/{} -> dst={}:{}/{} (name: {}, risk: {})".format(src, sport, proto, dst, dport, proto, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
+              config.msgbox[id_generator(10)] = {"title": "Evil IP source detected", "msg": "Traffic from {} ({}) with risk {} detected, check logs".format(src, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"])}
             else:
               config.loggers["resources"]["logger_anubi_ip"].get_logger().debug("src {}:{}/{} found to dst {}:{} ({} with risk {} but whitelisted)".format(src, sport, proto, dst, dport, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
     except Exception as e:

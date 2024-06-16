@@ -11,9 +11,18 @@ import conf_anubi
 import socket
 import string
 import random
+import git
+import shutil
 
 from sys import platform as _platform
 from datetime import datetime
+
+def clone_repo(repo_name, dst_path):
+  try:
+    return git.Repo.clone_from(repo_name, dst_path)
+  except Exception as e:
+    config.loggers["resources"]["logger_anubi_main"].get_logger().critical("Unable to download rules: {}".format(e))
+    return None
 
 def wait_for_updating(action):
   config.loggers["resources"]["logger_anubi_" + action].get_logger().debug("Refresh rule checker started")
@@ -154,21 +163,11 @@ def get_anubi_conf(type_output):
 
 def init_rules_repo(thread_name):
   config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Init rules repo")
-  p = subprocess.Popen("cd {} && rm -rf anubi-signatures && git clone https://github.com/kavat/anubi-signatures".format(config.anubi_path['conf_path']), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-  for line in p.stdout.readlines():
-    config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Clone rules repo stdout: {}".format(line.decode('ascii').rstrip()))
-  config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Clone rules repo exit_status: {}".format(p.wait()))
-
-def pull_rules_repo(thread_name):
-  config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Init pull rules repo")
-  p = subprocess.Popen("cd {} && git checkout -- . && git pull".format(config.anubi_path['rule_path']), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-  ritorno = ""
-  for line in p.stdout.readlines():
-    config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Update rules repo stdout: {}".format(line.decode('ascii').rstrip()))
-    ritorno = "{}{}".format(ritorno, line.decode('ascii'))
-  ritorno = "{}exit_status: {}".format(ritorno, p.wait())
-  config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Update rules repo exit_status: {}".format(p.wait()))
-  return ritorno
+  if os.path.isdir(config.anubi_path['conf_path']):
+    shutil.rmtree(config.anubi_path['conf_path'])
+  repo = clone_repo("https://github.com/kavat/anubi-signatures", config.anubi_path['signatures_path']) 
+  if repo is not None:
+    config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Clone rules repo status: {}".format(repo))
 
 def current_datetime():
   now = datetime.now()
@@ -185,7 +184,7 @@ def get_current_hours_minutes():
 def get_linux_dirs(dir_):
   r = []
   for top_dir in conf_anubi.voyeur_linux_top_dirs:
-    p = subprocess.Popen("find {} -type d -name \"{}\"".format(top_dir, dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    p = subprocess.Popen("find {} -type d -name \"{}\" 2>&1 | grep \"{}\"".format(top_dir, dir_, dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in p.stdout.readlines():
       r.append(line.decode('ascii').rstrip())
   return r
@@ -193,7 +192,7 @@ def get_linux_dirs(dir_):
 def get_macos_dirs(dir_):
   r = []
   for top_dir in conf_anubi.voyeur_mac_top_dirs:
-    p = subprocess.Popen("find /{} -type d -name \"{}\"".format(top_dir, dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    p = subprocess.Popen("find {} -type d -name \"{}\" 2>&1 | grep \"{}\"".format(top_dir, dir_, dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in p.stdout.readlines():
       r.append(line.decode('ascii').rstrip())
   return r

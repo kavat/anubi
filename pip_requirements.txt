@@ -3,3 +3,5 @@ psutil
 scapy
 watchdog
 yara-python
+py-notifier
+gitpython

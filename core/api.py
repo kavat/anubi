@@ -9,13 +9,44 @@ from flask import (
   render_template
 )
 from core.common import (
-  pull_rules_repo, 
+  init_rules_repo, 
   check_tcp_conn, 
   current_date
 )
 from pathlib import Path
 
 app = Flask(__name__)
+
+def refresh_by_api(func):
+  return "ciao"
+
+def refresh_yara():
+  if config.yara_scan.get() == True:
+    return "Yara scan in progress, can not update"
+  else:
+    config.updater_yara.set_updating(True)
+    config.scanners['yara_scanner'].load_rules()
+    config.updater_yara.set_updating(False)
+    return "Reloaded"
+
+def refresh_hash():
+  if config.hash_scan.get() == True:
+    return "Hash scan in progress, can not update"
+  else:
+    config.updater_hash.set_updating(True)
+    config.scanners['hash_scanner'].load_rules()
+    config.updater_hash.set_updating(False)
+    return "Reloaded"
+
+def refresh_ip():
+  if config.ip_check.get() == True:
+    return "Ip analysis in progress, can not update"
+  else:
+    config.updater_ip.set_updating(True)
+    config.scanners['ip_checker'].load_rules()
+    config.updater_ip.set_updating(False)
+    return "Reloaded"
+
 
 @app.route("/", methods=['GET'])
 def index():
@@ -28,49 +59,37 @@ def api():
       if request.args.get('func') == 'test':
         return "AM I LORD VOLDEMORT"
       if request.args.get('func') == 'refresh_yara':
-        if config.yara_scan.get() == True:
-          return "Yara scan in progress, can not update"
-        else:
-          config.updater_yara.set_updating(True)
-          config.scanners['yara_scanner'].load_rules()
-          config.updater_yara.set_updating(False)
-          return "Reloaded"
+        return refresh_yara()
       if request.args.get('func') == 'refresh_hash':
-        if config.hash_scan.get() == True:
-          return "Hash scan in progress, can not update"
-        else:
-          config.updater_hash.set_updating(True)
-          config.scanners['hash_scanner'].load_rules()
-          config.updater_hash.set_updating(False)
-          return "Reloaded"
+        return refresh_hash()
       if request.args.get('func') == 'refresh_ip':
-        if config.ip_check.get() == True:
-          return "Ip analysis in progress, can not update"
-        else:
-          config.updater_ip.set_updating(True)
-          config.scanners['ip_checker'].load_rules()
-          config.updater_ip.set_updating(False)
-          return "Reloaded"
+        return refresh_ip()
       if request.args.get('func') == 'download_signatures':
-        return pull_rules_repo('management')
+        return init_rules_repo('management')
       if request.args.get('func') == "force_yara_scan":
         if request.args.get('dir') is not None:
-          if os.path.isdir(request.args.get('dir')):
-            config.force_yara_scan = True
-            config.force_yara_scan_dirs = request.args.get('dir')
-            return "Queued, waiting for start"
+          if config.force_yara_scan == False:
+            if os.path.isdir(request.args.get('dir')):
+              config.force_yara_scan = True
+              config.force_yara_scan_dirs = request.args.get('dir')
+              return "Queued, waiting for start"
+            else:
+              return "Directory {} not available".format(request.args.get('dir'))
           else:
-            return "Directory {} not available".format(request.args.get('dir'))
+            return "Forced scan already in progress, wait until end"
         else:
           return "Parameter directory missed"
       if request.args.get('func') == "force_hash_scan":
         if request.args.get('dir') is not None:
-          if os.path.isdir(request.args.get('dir')):
-            config.force_hash_scan = True
-            config.force_hash_scan_dirs = request.args.get('dir')
-            return "Queued, waiting for start"
+          if config.force_hash_scan == False:
+            if os.path.isdir(request.args.get('dir')):
+              config.force_hash_scan = True
+              config.force_hash_scan_dirs = request.args.get('dir')
+              return "Queued, waiting for start"
+            else:
+              return "Directory {} not available".format(request.args.get('dir'))
           else:
-            return "Directory {} not available".format(request.args.get('dir'))
+            return "Forced scan already in progress, wait until end"
         else:
           return "Parameter directory missed"
       if request.args.get('func') == "report":

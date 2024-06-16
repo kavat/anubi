@@ -11,7 +11,6 @@ import conf_anubi
 from core.common import (
   wait_for_updating,
   file_exclusions,
-  pull_rules_repo,
   get_current_hours_minutes,
   id_generator,
   write_report,
@@ -20,13 +19,13 @@ from core.common import (
 
 class YaraScan:
 
-    status = False
+  status = False
 
-    def get(self):
-      return self.status
+  def get(self):
+    return self.status
 
-    def set(self, status):
-      self.status = status
+  def set(self, status):
+    self.status = status
 
 class YaraScanner:
 
@@ -36,7 +35,6 @@ class YaraScanner:
     if os.path.isdir(config.anubi_path['rule_path']) == False and os.path.isdir(config.anubi_path['custom_rule_path']) == False:
       config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("{} not found, exit".format(config.anubi_path['rule_path']))
       sys.exit(1)
-    #pull_rules_repo('yara')
     self.load_rules()
 
   def load_rules(self):
@@ -78,6 +76,7 @@ class YaraScanner:
     return []
 
 def yara_scan_file(yara_scanner, file_path, func_orig, report_filename):
+  found_ = 0
   try:
     if file_exclusions(file_path) == False:
       matches = yara_scanner.check(file_path)
@@ -87,22 +86,25 @@ def yara_scan_file(yara_scanner, file_path, func_orig, report_filename):
             config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
             write_report(report_filename, "Rule {} matched for {}".format(found, file_path))
             write_stats(func_orig, "Rule {} matched for {}".format(found, file_path))
+            found_ = 1
           else:
             config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("Rule {} matched for {} but whitelisted".format(found, file_path))
-            write_report(report_filename, "Rule {} matched for {} but whitelisted".format(found, file_path))
+            #write_report(report_filename, "Rule {} matched for {} but whitelisted".format(found, file_path))
       else:
         config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
-        write_report(report_filename, "{} cleaned".format(file_path))
+        #write_report(report_filename, "{} cleaned".format(file_path))
     else:
       config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} discarded".format(file_path))
-      write_report(report_filename, "{} discarded".format(file_path)) 
+      #write_report(report_filename, "{} discarded".format(file_path)) 
   except FileNotFoundError:
     pass
+  return found_
 
 def start_yara_scanner(yara_scanner, file_paths, report_filename):
   config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Check for updating status")
   wait_for_updating('yara')
   config.yara_scan.set(True)
+  found = 0
   try:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Yara scan started")
     for file_path in file_paths:
@@ -110,15 +112,19 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
         file_path_dir = pathlib.Path(file_path)
         for file_path_rec in file_path_dir.rglob("*"):
           if os.path.isfile(str(file_path_rec)):
-            yara_scan_file(yara_scanner, str(file_path_rec), 'yara', report_filename)
+            status_yara = yara_scan_file(yara_scanner, str(file_path_rec), 'yara', report_filename)
+            found = found + status_yara
       if os.path.isfile(file_path):
-        yara_scan_file(yara_scanner, file_path, 'yara', report_filename)
+        status_yara = yara_scan_file(yara_scanner, file_path, 'yara', report_filename)
+        found = found + status_yara
   except Exception as e:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during start_yara_scanner")
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("start_yara_scanner() BOOM!!!")
   config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Yara scan finished")
   config.yara_scan.set(False)
+  if found > 0:
+    config.msgbox[id_generator(10)] = {"title": "Periodic Yara scan", "msg": "IOC detected, please check reports or logs"}
 
 def yara_scanner_periodic_polling(yara_scanner, file_paths):
   try:
@@ -149,7 +155,7 @@ def yara_scanner_polling(yara_scanner):
         else:
           config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Forced yara_scan without dirs as argument, skipped action")
         config.force_yara_scan = False
-      time.sleep(20)
+      time.sleep(1)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during yara_scanner_polling")
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)

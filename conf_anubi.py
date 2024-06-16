@@ -15,8 +15,8 @@ extension_exclusions = [".yar", ".yara", ".h", ".pem", ".crt", ".dat", ".dat-old
 # DIRECTORY SET FOR FS HOOKS
 # DYNAMIC GENERATION: A FIND COMMAND IS RUN USING voyeur_linux_top_dirs ELEMENT AS PATH AND voyeur_dirs_wild AS EXPRESSION AND RESULT IS USED
 # STATIC GENERATION: voyeur_dirs_nowild IS USED DIRECTLY AS DIRECTORY
-voyeur_linux_top_dirs = ['/']
-voyeur_mac_top_dirs = []
+voyeur_linux_top_dirs = ['/home']
+voyeur_mac_top_dirs = ['/Users']
 voyeur_dirs_wild = ["download", "downloads", "Download", "Downloads", "Scaricati"]
 voyeur_dirs_nowild = ["/tmp"]
 
@@ -30,7 +30,7 @@ yara_whitelist = ["SurtrStrings", "Surtr"]
 hash_whitelist = ["1ebbd3e34237af26da5dc08a4e440464"]
 
 # IP WHITELIST
-ip_whitelist = ["1.1.1.1"]
+ip_whitelist = ["192.229.221.95"]
 
 # SUFFIX REPORT NAMES
 yara_report_suffix = "yara"

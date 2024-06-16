@@ -16,7 +16,8 @@ from watchdog.utils import BaseThread
 from core.common import (
   wait_for_updating,
   file_exclusions,
-  get_voyeur_dirs
+  get_voyeur_dirs,
+  id_generator
 )
 from core.yara_scanner import yara_scan_file
 from core.hash_scanner import hash_scan_file
@@ -49,7 +50,8 @@ class FsVoyeurEvent(LoggingEventHandler):
           config.yara_scan.set(True)
           try:
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Starting yara scanning on {}".format(event.src_path))
-            yara_scan_file(self.yara_scanner, event.src_path, 'voyeur', '')
+            if yara_scan_file(self.yara_scanner, event.src_path, 'voyeur', ''):
+              config.msgbox[id_generator(10)] = {"title": "Voyeur IOC scan", "msg": "IOC detected on {}".format(event.src_path)}
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Finished yara scanning on {}".format(event.src_path))
           except Exception as e:
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Exception during yara_voyeur on {}".format(event.src_path))
@@ -62,7 +64,8 @@ class FsVoyeurEvent(LoggingEventHandler):
           config.hash_scan.set(True)
           try:
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Starting hash scanning on {}".format(event.src_path))
-            hash_scan_file(self.hash_scanner, event.src_path, 'voyeur', '')
+            if hash_scan_file(self.hash_scanner, event.src_path, 'voyeur', ''):
+              config.msgbox[id_generator(10)] = {"title": "Voyeur Malware scan", "msg": "Malware detected on {}".format(event.src_path)}
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Finished hash scanning on {}".format(event.src_path))
           except Exception as e:
             config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Exception during hash_voyeur scan on {}".format(event.src_path))
@@ -88,6 +91,7 @@ class FsVoyeur:
   def __init__(self, yara_scanner, hash_scanner):
     self.yara_scanner = yara_scanner
     self.hash_scanner = hash_scanner
+    config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Starting directory identification, waiting please")
     self.dirs = get_voyeur_dirs()
 
   def get_dirs(self):
@@ -101,6 +105,8 @@ class FsVoyeur:
 
 def fs_voyeur_polling(fs_voyeur):
   try:
+    #config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Starting directory identification")
+    #fs_voyeur.dirs = get_voyeur_dirs()
     for dir_ in fs_voyeur.get_dirs(): 
       observer = Observer()
       observer.schedule(FsVoyeurEvent(fs_voyeur.get_yara_scanner(), fs_voyeur.get_hash_scanner()), dir_, recursive=True)

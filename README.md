@@ -127,3 +127,11 @@ only adding them in conf_anubi.py in specific whitelist:
 * Yara rules specified by name (example Certutil_Decode_OR_Download) in yara_whitelist
 * Hash (example 1ebbd3e34237af26da5dc08a4e440464) in hash_whitelist
 * IP (example 1.1.1.1) in ip_whitelist
+
+## Notifications
+Anubi is able to launch notifications in desktop environments, using py-notifier library. Notification is fired when:
+* IOC for periodic scan, on-demand scan or Voyeur is detected
+* Malware for periodic scan, on-demand scan or Voyeur is detected
+* IP marked as malicious is detected in network activity
+
+![Anubi notification](images/anubi_notification.png)

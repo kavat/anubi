@@ -28,6 +28,7 @@ def get_application_path():
 application_path = get_application_path()
 anubi_path = {
   "conf_path": "{}/conf".format(application_path),
+  "signatures_path": "{}/conf/anubi-signatures".format(application_path),
   "rule_path": "{}/conf/anubi-signatures/yara".format(application_path),
   "hash_path": "{}/conf/anubi-signatures/hash".format(application_path),
   "ip_path": "{}/conf/anubi-signatures/ips".format(application_path),
@@ -94,3 +95,5 @@ force_yara_scan_dirs = ""
 
 force_hash_scan = False
 force_hash_scan_dirs = ""
+
+msgbox = {}

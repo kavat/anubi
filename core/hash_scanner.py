@@ -12,7 +12,6 @@ from core.common import (
   wait_for_updating,
   get_hash_file,
   file_exclusions,
-  pull_rules_repo,
   get_current_hours_minutes,
   id_generator,
   write_report,
@@ -21,13 +20,13 @@ from core.common import (
 
 class HashScan:
 
-    status = False
+  status = False
 
-    def get(self):
-      return self.status
+  def get(self):
+    return self.status
 
-    def set(self, status):
-      self.status = status
+  def set(self, status):
+    self.status = status
 
 class HashScanner:
 
@@ -37,7 +36,6 @@ class HashScanner:
     if os.path.isdir(config.anubi_path['hash_path']) == False and os.path.isdir(config.anubi_path['custom_hash_path']) == False:
       config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("{} not found, exit".format(config.anubi_path['hash_path']))
       sys.exit(1)
-    #pull_rules_repo('hash')
     self.load_rules()
 
   def load_rules(self):
@@ -90,6 +88,7 @@ class HashScanner:
     return ""
 
 def hash_scan_file(hash_scanner, file_path, func_orig, report_filename):
+  found = 0
   try:
     if file_exclusions(file_path) == False:
       matches = hash_scanner.check(file_path)
@@ -97,19 +96,22 @@ def hash_scan_file(hash_scanner, file_path, func_orig, report_filename):
         config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Malware {} matched for {}".format(matches, file_path))
         write_report(report_filename, "Malware {} matched for {}".format(matches, file_path))
         write_stats(func_orig, "Malware {} matched for {}".format(matches, file_path))
+        found = 1
       else:
         config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
-        write_report(report_filename, "{} cleaned".format(file_path))
+        #write_report(report_filename, "{} cleaned".format(file_path))
     else:
       config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} discarded".format(file_path))
-      write_report(report_filename, "{} discarded".format(file_path)) 
+      #write_report(report_filename, "{} discarded".format(file_path)) 
   except FileNotFoundError:
     pass
+  return found
 
 def start_hash_scanner(hash_scanner, file_paths, report_filename):
   config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Check for updating status")
   wait_for_updating('hash')
   config.hash_scan.set(True)
+  found = 0
   try:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Hash scan started")
     for file_path in file_paths:
@@ -117,15 +119,17 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
         file_path_dir = pathlib.Path(file_path)
         for file_path_rec in file_path_dir.rglob("*"):
           if os.path.isfile(str(file_path_rec)):
-            hash_scan_file(hash_scanner, str(file_path_rec), 'hash', report_filename)
+            found = found + hash_scan_file(hash_scanner, str(file_path_rec), 'hash', report_filename)
       if os.path.isfile(file_path):
-        hash_scan_file(hash_scanner, file_path, 'hash', report_filename)
+        found = found + hash_scan_file(hash_scanner, file_path, 'hash', report_filename)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during start_hash_scanner")
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("start_hash_scanner() BOOM!!!")
   config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Hash scan finished")
   config.hash_scan.set(False)
+  if found > 0:
+    config.msgbox[id_generator(10)] = {"title": "Periodic Hash scan", "msg": "Malware detected, please check reports or logs"}
 
 def hash_scanner_periodic_polling(hash_scanner, file_paths):
   try:
@@ -156,7 +160,7 @@ def hash_scanner_polling(hash_scanner):
         else:
           config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Forced hash_scan without dirs as argument, skipped action")
         config.force_hash_scan = False
-      time.sleep(20)
+      time.sleep(1)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during hash_scanner_polling")
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical(e, exc_info=True)

@@ -1,7 +1,6 @@
-#!/usr/bin/python3
-
 import sys
 import os
+import tkinter
 import config
 import time
 import conf_anubi
@@ -29,7 +28,10 @@ from core.fs_voyeur import (
   FsVoyeur,
   fs_voyeur_polling
 )
-from core.api import start_api
+from core.api import (
+  start_api,
+  refresh_by_api
+)
 from core.common import (
   first_setup,
   get_anubi_conf,
@@ -41,6 +43,7 @@ from core.common import (
   create_anubi_struct,
   is_root
 )
+from core.msgbox import MsgBox
 from argparse import ArgumentParser
 
 if is_root() == 0:
@@ -58,11 +61,26 @@ parser.add_argument('--init', action='store_true', help='Init configuration')
 parser.add_argument('--start', action='store_true', help='Start Anubi with configuration created and rules already present')
 parser.add_argument('--start-full', action='store_true', help='Start Anubi with configuration created downloading last rules')
 parser.add_argument('--wipe', action='store_true', help='Wipe Anubi logs')
+parser.add_argument('--refresh-yara', action='store_true', help='Reload yara rules, this action will use the already present ones, please download the newest before')
+parser.add_argument('--refresh-hash', action='store_true', help='Reload hash rules, this action will use the already present ones, please download the newest before')
+parser.add_argument('--refresh-ip', action='store_true', help='Reload IP, this action will use the already present ones, please download the newest before')
 args = parser.parse_args()
 
-if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False:
+if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False:
   print("Run with argument or -h/--help")
   sys.exit(1)
+
+if args.refresh_yara == True:
+  print(refresh_by_api('yara'))
+  sys.exit(0)
+
+if args.refresh_hash == True:
+  print(refresh_by_api('hash'))
+  sys.exit(0)
+
+if args.refresh_ip == True:
+  print(refresh_by_api('ip'))
+  sys.exit(0)
 
 if args.init == True:
   first_setup()
@@ -91,12 +109,12 @@ if args.start == True and args.start_full == True:
 
 if args.start == True or args.start_full == True:
 
+  if args.start_full == True:
+    create_anubi_struct()
+
   if args.start == True and check_anubi_struct() == False:
     print("Something wrong during structure checks, run --create-struct before")
     sys.exit(1)
-
-  if args.start_full == True:
-    create_anubi_struct()
 
   if os.path.isfile(config.anubi_path['configfile_path']) == False:
     first_setup()
@@ -147,11 +165,26 @@ if args.start == True or args.start_full == True:
 
     config.threads["management"] = AnubiThread("management", start_api, (conf_anubi.management_host,conf_anubi.management_port,))
 
+    config.loggers["resources"]["logger_anubi_main"].get_logger().info("Starting threads..")
     start_threads()
 
+    counter = 0
     while True:
-      config.loggers["resources"]["logger_anubi_main"].get_logger().info("Living Anubi..")
-      time.sleep(60)
+      if counter == 6:
+        counter = 0
+      if counter % 6 == 0:
+        config.loggers["resources"]["logger_anubi_main"].get_logger().info("Living Anubi..")
+      msgbox_managed = []
+      for msg_id in config.msgbox:
+        MsgBox(config.msgbox[msg_id]["title"], config.msgbox[msg_id]["msg"])
+        msgbox_managed.append(msg_id)
+      for msg_id in msgbox_managed:
+        try:
+          del config.msgbox[msg_id]
+        except Exception as e_:
+          config.loggers["resources"]["logger_anubi_main"].get_logger().error("Unable to remove {} from msgbox: {}".format(msg_id, e_))
+      counter = counter + 1
+      time.sleep(10)
 
   except KeyboardInterrupt:
     config.loggers["resources"]["logger_anubi_main"].get_logger().info("Stop")
