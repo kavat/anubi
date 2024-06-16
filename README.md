@@ -47,6 +47,10 @@ Linux and MacOS are supported by Anubi; Windows will be soon.
 
 ## Dependencies
 External dependencies are needed:
+* Git
+  * Linux (Debian): `apt install git-core`
+  * Linux (Centos): `yum install git-core`
+  * MacOS: `brew install git`
 * Python3
   * Linux (Debian): `apt install python3`
   * Linux (Centos): `yum install python3`
