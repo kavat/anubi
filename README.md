@@ -89,8 +89,6 @@ Remember to run always as **root** user!
 In order to start and control our assets, follow the flow below:
 * clone repo
 * install dependencies
-* run Anubi with --create-struct to prepare system
-* run Anubi with --init to create the configuration for periodic scan
 * run Anubi with --start-full
 
 During first time start Anubi will ask for its internal set up, as:
