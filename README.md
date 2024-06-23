@@ -29,16 +29,16 @@ Voyeur is an active monitoring on the filesystem directories specified applying 
 
 ### API
 Anubi helps users with its own API system used to interact. 
-Command to connect with API system `curl http://127.0.0.1:5000/api?func=help` provides available references:
-* download_signatures, `http://127.0.0.1:5000/api?func=download_signatures` allows pulling from anubi-signatures repository for rules update without reload them in Anubi
-* refresh_yara, `http://127.0.0.1:5000/api?func=refresh_yara` refreshes official and custom Yara rules
-* refresh_hash, `http://127.0.0.1:5000/api?func=refresh_hash` refreshes official and custom Malware hash rules
-* refresh_ip, `http://127.0.0.1:5000/api?func=refresh_ip` refreshes official and custom IP for network monitoring
-* force_yara_scan, `http://127.0.0.1:5000/api?func=force_yara_scan&dir=url_encoded_dir` forces a yara scan (dir parameter shall be url-encoded)
-* force_hash_scan, `http://127.0.0.1:5000/api?func=force_hash_scan&dir=url_encoded_dir` forces a hash scan (dir parameter shall be url-encoded)
-* report, `http://127.0.0.1:5000/api?func=report&dir=report_type` requires and prints the report for the current day for the selected type (yara, hash, voyeur or ips)
+Command to connect with API system `curl http://127.0.0.1:5001/api?func=help` provides available references:
+* download_signatures, `http://127.0.0.1:5001/api?func=download_signatures` allows pulling from anubi-signatures repository for rules update without reload them in Anubi
+* refresh_yara, `http://127.0.0.1:5001/api?func=refresh_yara` refreshes official and custom Yara rules
+* refresh_hash, `http://127.0.0.1:5001/api?func=refresh_hash` refreshes official and custom Malware hash rules
+* refresh_ip, `http://127.0.0.1:5001/api?func=refresh_ip` refreshes official and custom IP for network monitoring
+* force_yara_scan, `http://127.0.0.1:5001/api?func=force_yara_scan&dir=url_encoded_dir` forces a yara scan (dir parameter shall be url-encoded)
+* force_hash_scan, `http://127.0.0.1:5001/api?func=force_hash_scan&dir=url_encoded_dir` forces a hash scan (dir parameter shall be url-encoded)
+* report, `http://127.0.0.1:5001/api?func=report&dir=report_type` requires and prints the report for the current day for the selected type (yara, hash, voyeur or ips)
 
-User is helped by a simply webui in order to interact with Anubi (as default console is reacheable at http://127.0.0.:5000)
+User is helped by a simply webui in order to interact with Anubi (as default console is reacheable at http://127.0.0.:5001)
 
 ![Anubu WebUI](images/webui.png)
 
