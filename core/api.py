@@ -65,7 +65,10 @@ def api():
       if request.args.get('func') == 'refresh_ip':
         return refresh_ip()
       if request.args.get('func') == 'download_signatures':
-        return init_rules_repo('management')
+        if init_rules_repo('management') is not None:
+          return "Download triggered"
+        else:
+          return "Error during download, check logs"
       if request.args.get('func') == "force_yara_scan":
         if request.args.get('dir') is not None:
           if config.force_yara_scan == False:

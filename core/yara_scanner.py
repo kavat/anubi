@@ -14,7 +14,8 @@ from core.common import (
   get_current_hours_minutes,
   id_generator,
   write_report,
-  write_stats
+  write_stats,
+  test_file
 )
 
 class YaraScan:
@@ -70,7 +71,11 @@ class YaraScanner:
 
   def check(self, file_path):
     try:
-      return self.compiled_rules.match(file_path)
+      check_file_access = test_file(file_path)
+      if check_file_access["status"] == 'ok':
+        return self.compiled_rules.match(file_path)
+      else:
+        config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Error accessing {}: {}".format(file_path, check_file_access["msg"]))
     except yara.Error as e:
       config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Exception on {}: {}".format(file_path, e))
     return []

@@ -42,7 +42,7 @@ class IpChecker:
       for file_ip in os.listdir(config.anubi_path['ip_path']):
         full_path_ip = "{}/{}".format(config.anubi_path['ip_path'], file_ip)
         try:
-          with open(full_path_ip) as f:
+          with open(full_path_ip, encoding="utf8") as f:
             for line in f:
               try:
                 ip_tag_name = line.rstrip().split(":")[1]

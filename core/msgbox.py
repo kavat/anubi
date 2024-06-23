@@ -11,8 +11,6 @@ class MsgBox:
     notification = pynotifier.Notification(
         title=title,
         message=message,
-        icon_path="path/to/icon",
-        duration=60,
         keep_alive=True,  # keep toast alive in System Tray whether it was clicked or not
         threaded=True     # spawns a separate thread inorder not to block the main app thread
     )

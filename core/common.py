@@ -12,7 +12,6 @@ import socket
 import string
 import random
 import git
-import shutil
 
 from sys import platform as _platform
 from datetime import datetime
@@ -22,6 +21,16 @@ def clone_repo(repo_name, dst_path):
     return git.Repo.clone_from(repo_name, dst_path)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_main"].get_logger().critical("Unable to download rules: {}".format(e))
+    return None
+
+def pull_repo(dst_path):
+  try:
+    repo = git.Repo(dst_path)
+    o = repo.remotes.origin
+    o.pull()
+    return repo
+  except Exception as e:
+    config.loggers["resources"]["logger_anubi_main"].get_logger().critical("Unable to pull git rules repo: {}".format(e))
     return None
 
 def wait_for_updating(action):
@@ -108,7 +117,9 @@ def first_setup():
   print("Welcome to the first setup for Anubi!")
   try:
     print("Enter the answers for the following questions in order to build your configuration")
-    loop_until_input("Do you want start? (Y/N) ", ['Y','N'])
+    init_process = loop_until_input("Do you want start? (Y/N) ", ['Y','N'])
+    if init_process == "N":
+      sys.exit(0)
     ioc_ = loop_until_input("Do you want enable daily passive IOC detection? (Y/N) ", ['Y','N'])
     anubi_conf_str = "yara={}\n".format(ioc_)
     if ioc_ == "Y":
@@ -163,11 +174,15 @@ def get_anubi_conf(type_output):
 
 def init_rules_repo(thread_name):
   config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Init rules repo")
-  if os.path.isdir(config.anubi_path['conf_path']):
-    shutil.rmtree(config.anubi_path['conf_path'])
-  repo = clone_repo("https://github.com/kavat/anubi-signatures", config.anubi_path['signatures_path']) 
+  repo = None
+  if os.path.isdir(config.anubi_path['signatures_path']):
+    config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Directory {}, exists, proceeding with pull".format(config.anubi_path['signatures_path']))
+    repo = pull_repo(config.anubi_path['signatures_path'])
+  else:
+    repo = clone_repo("https://github.com/kavat/anubi-signatures", config.anubi_path['signatures_path']) 
   if repo is not None:
     config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Clone rules repo status: {}".format(repo))
+  return repo
 
 def current_datetime():
   now = datetime.now()
@@ -181,36 +196,31 @@ def get_current_hours_minutes():
   c = datetime.now()
   return c.strftime('%H:%M')
 
-def get_linux_dirs(dir_):
-  r = []
-  for top_dir in conf_anubi.voyeur_linux_top_dirs:
-    p = subprocess.Popen("find {} -type d -name \"{}\" 2>&1 | grep \"{}\"".format(top_dir, dir_, dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in p.stdout.readlines():
-      r.append(line.decode('ascii').rstrip())
-  return r
-
-def get_macos_dirs(dir_):
-  r = []
-  for top_dir in conf_anubi.voyeur_mac_top_dirs:
-    p = subprocess.Popen("find {} -type d -name \"{}\" 2>&1 | grep \"{}\"".format(top_dir, dir_, dir_), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in p.stdout.readlines():
-      r.append(line.decode('ascii').rstrip())
-  return r
+def scan_dir(dir):
+  try:
+    for f in os.listdir(dir):
+      if os.path.isdir("{}/{}".format(dir,f)):
+        if f in conf_anubi.voyeur_dirs_wild:
+          config.voyeur_dir_scan.append("{}/{}".format(dir,f))
+          print("Found {}/{}".format(dir,f))
+        else:
+          scan_dir("{}/{}".format(dir,f))
+  except:
+    pass
 
 def get_voyeur_dirs():
-  d = []
   if conf_anubi.voyeur_dirs_wild != []:
-    for dir_ in conf_anubi.voyeur_dirs_wild:
-      if get_platform() == "linux":
-        for dir_r in get_linux_dirs(dir_):
-          d.append(dir_r)
-      if get_platform() == "macos":
-        for dir_r in get_macos_dirs(dir_): 
-          d.append(dir_r)
+    top_dirs = []
+    if get_platform() == "linux" or get_platform() == "macos":
+      top_dirs = conf_anubi.voyeur_unix_top_dirs
+    if get_platform() == "windows":
+      top_dirs = conf_anubi.voyeur_win_top_dirs
+    for top_dir in top_dirs:
+      scan_dir(top_dir) 
   if conf_anubi.voyeur_dirs_nowild != []:
     for dir_ in conf_anubi.voyeur_dirs_nowild:
-      d.append(dir_)
-  return d
+      config.voyeur_dir_scan.append(dir_)
+  return config.voyeur_dir_scan
 
 def check_anubi_struct():
   ritorno = True
@@ -238,10 +248,14 @@ def create_anubi_struct():
           print("{} in path {} not exists".format(dir, config.anubi_path[dir]))
 
 def is_root(): 
-  if os.geteuid()==0:
-    return 1
+  if get_platform() == "windows":
+    from win32com.shell import shell
+    return shell.IsUserAnAdmin()
   else:
-    return 0
+    if os.geteuid()==0:
+      return 1
+    else:
+      return 0
 
 def check_tcp_conn(host, port):
   s = socket.socket()
@@ -255,6 +269,15 @@ def check_tcp_conn(host, port):
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
   return ''.join(random.choice(chars) for _ in range(size))
+
+def test_file(file_path):
+  try:
+    f = open(file_path, "r")
+    first_line = f.readline()
+    f.close()
+    return {'status':'ok'}
+  except Exception as e:
+    return {'status':'ko','msg':e}
 
 def write_report(report_filename, msg):
   if report_filename != "":

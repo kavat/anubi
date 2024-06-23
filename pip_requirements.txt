@@ -1,7 +1,7 @@
 Flask
 psutil
 scapy
-watchdog
+watchdog=4.0.1
 yara-python
 py-notifier
 gitpython

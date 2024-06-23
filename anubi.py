@@ -175,14 +175,17 @@ if args.start == True or args.start_full == True:
       if counter % 6 == 0:
         config.loggers["resources"]["logger_anubi_main"].get_logger().info("Living Anubi..")
       msgbox_managed = []
-      for msg_id in config.msgbox:
-        MsgBox(config.msgbox[msg_id]["title"], config.msgbox[msg_id]["msg"])
-        msgbox_managed.append(msg_id)
-      for msg_id in msgbox_managed:
-        try:
-          del config.msgbox[msg_id]
-        except Exception as e_:
-          config.loggers["resources"]["logger_anubi_main"].get_logger().error("Unable to remove {} from msgbox: {}".format(msg_id, e_))
+      try:
+        for msg_id in config.msgbox:
+          MsgBox(config.msgbox[msg_id]["title"], config.msgbox[msg_id]["msg"])
+          msgbox_managed.append(msg_id)
+        for msg_id in msgbox_managed:
+          try:
+            del config.msgbox[msg_id]
+          except Exception as e_:
+            config.loggers["resources"]["logger_anubi_main"].get_logger().error("Unable to remove {} from msgbox: {}".format(msg_id, e_))
+      except Exception as en:
+        config.loggers["resources"]["logger_anubi_main"].get_logger().critical("Unable to manage notification: {}".format(en))
       counter = counter + 1
       time.sleep(10)
 

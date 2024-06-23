@@ -9,6 +9,7 @@ import queue
 import conf_anubi
 
 from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 from watchdog.observers.api import EventDispatcher
 from watchdog.events import LoggingEventHandler
 from watchdog.utils import BaseThread
@@ -105,15 +106,15 @@ class FsVoyeur:
 
 def fs_voyeur_polling(fs_voyeur):
   try:
-    #config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Starting directory identification")
-    #fs_voyeur.dirs = get_voyeur_dirs()
     for dir_ in fs_voyeur.get_dirs(): 
-      observer = Observer()
-      observer.schedule(FsVoyeurEvent(fs_voyeur.get_yara_scanner(), fs_voyeur.get_hash_scanner()), dir_, recursive=True)
-      config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Voyeur on {}".format(dir_))
-      observer.start()
-    #while True:
-    #  time.sleep(1)
+      try:
+        #observer = Observer()
+        observer = PollingObserver()
+        observer.schedule(FsVoyeurEvent(fs_voyeur.get_yara_scanner(), fs_voyeur.get_hash_scanner()), dir_, recursive=True)
+        config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Voyeur on {}".format(dir_))
+        observer.start()
+      except Exception as ee:
+        config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Exception on {}: {}".format(dir_, ee))      
   except Exception as e:
     config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical("Error during fs_voyeur_polling")
     config.loggers["resources"]["logger_anubi_voyeur"].get_logger().critical(e, exc_info=True)

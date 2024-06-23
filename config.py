@@ -97,3 +97,5 @@ force_hash_scan = False
 force_hash_scan_dirs = ""
 
 msgbox = {}
+
+voyeur_dir_scan = []

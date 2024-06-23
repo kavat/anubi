@@ -51,6 +51,7 @@ External dependencies are needed:
   * Linux (Debian): `apt install git-core`
   * Linux (Centos): `yum install git-core`
   * MacOS: `brew install git`
+  * Windows: follow [official documentation](https://git-scm.com/download/win)
 * Python3
   * Linux (Debian): `apt install python3`
   * Linux (Centos): `yum install python3`
