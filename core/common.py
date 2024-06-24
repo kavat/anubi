@@ -273,7 +273,6 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 def test_file(file_path):
   try:
     f = open(file_path, "r")
-    first_line = f.readline()
     f.close()
     return {'status':'ok'}
   except Exception as e:
