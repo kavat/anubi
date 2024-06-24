@@ -76,10 +76,10 @@ class YaraScanner:
         return self.compiled_rules.match(file_path)
       else:
         config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Error accessing {}: {}".format(file_path, check_file_access["msg"]))
-    except yara.Error as e:
-      config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Yara.Error exception on {}: {}".format(file_path, e))
     except UnicodeEncodeError as ee:
-      config.loggers["resources"]["logger_anubi_yara"].get_logger().error("UnicodeEncodeError exception on {}: {}".format(file_path, e))      
+      config.loggers["resources"]["logger_anubi_yara"].get_logger().error("UnicodeEncodeError exception on {}: {}".format(file_path, ee))
+    except yara.Error as e:
+      config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Yara.Error exception on {}: {}".format(file_path, e))      
     return []
 
 def yara_scan_file(yara_scanner, file_path, func_orig, report_filename):
