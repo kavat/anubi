@@ -4,7 +4,7 @@ sleep_thread_socket_restart = 60
 
 # PARAMETER FOR API SERVICE BINDING
 management_host = "127.0.0.1"
-management_port = 5001
+management_port = 5555
 
 # LINUX AND MACOS DIRECTORY EXCLUSIONS FROM SCAN
 linux_dir_exclusions = ["/proc/", "/dev/", "/sys/", "/usr/src/linux/", "/opt/yara", "/var/lib/apt/lists/"]

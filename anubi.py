@@ -1,6 +1,5 @@
 import sys
 import os
-import tkinter
 import config
 import time
 import conf_anubi
@@ -191,4 +190,5 @@ if args.start == True or args.start_full == True:
 
   except KeyboardInterrupt:
     config.loggers["resources"]["logger_anubi_main"].get_logger().info("Stop")
+    sys.exit(0)
 
