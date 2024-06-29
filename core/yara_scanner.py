@@ -49,7 +49,7 @@ class YaraScanner:
           config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Loaded {}".format(full_path_rule))
           rules[full_path_rule] = full_path_rule
         except yara.SyntaxError as ey:
-          config.loggers["resources"]["logger_anubi_yara"].get_logger().warn("Error on {}: {}, skipped".format(full_path_rule, ey))
+          config.loggers["resources"]["logger_anubi_yara"].get_logger().warning("Error on {}: {}, skipped".format(full_path_rule, ey))
         except Exception as e:
           config.loggers["resources"]["logger_anubi_yara"].get_logger().exception(e, traceback.format_exc())
           config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("yara load_rules() BOOM!!!")
