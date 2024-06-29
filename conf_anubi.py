@@ -17,9 +17,10 @@ extension_exclusions = [".yar", ".yara", ".h", ".pem", ".crt", ".dat", ".dat-old
 # STATIC GENERATION: voyeur_dirs_nowild IS USED DIRECTLY AS DIRECTORY
 voyeur_unix_top_dirs = ['/home', '/Users']
 #voyeur_unix_top_dirs = []
-voyeur_win_top_dirs = ['C:']
+voyeur_win_top_dirs = ['C:/']
 voyeur_dirs_wild = ["download", "downloads", "Download", "Downloads", "Scaricati"]
-voyeur_dirs_nowild = ["/tmp"]
+voyeur_unix_dirs_nowild = ["/tmp"]
+voyeur_win_dirs_nowild = []
 
 # MAX SIZE FILE TO CHECK BY SCAN
 max_file_size = 52428800

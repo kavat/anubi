@@ -54,13 +54,13 @@ path_logger_anubi_master_exceptions = "{}/anubi_boom.log".format(base_log)
 
 loggers = {}
 loggers["resources"] = {}
-loggers["resources"]["logger_anubi_main"] = AnubiLogger("anubi_main", path_logger_anubi_main, log_to_stdout, logging.INFO)
-loggers["resources"]["logger_anubi_yara"] = AnubiLogger("anubi_yara", path_logger_anubi_yara, log_to_stdout, logging.INFO)
-loggers["resources"]["logger_anubi_hash"] = AnubiLogger("anubi_hash", path_logger_anubi_hash, log_to_stdout, logging.INFO)
-loggers["resources"]["logger_anubi_ip"] = AnubiLogger("anubi_ip", path_logger_anubi_ip, log_to_stdout, logging.INFO)
-loggers["resources"]["logger_anubi_voyeur"] = AnubiLogger("anubi_voyeur", path_logger_anubi_voyeur, log_to_stdout, logging.INFO)
-loggers["resources"]["logger_anubi_management"] = AnubiLogger("anubi_management", path_logger_anubi_management, log_to_stdout, logging.INFO)
-loggers["resources"]["logger_anubi_master_exceptions"] = AnubiLogger("anubi_master_exceptions", path_logger_anubi_master_exceptions, log_to_stdout, logging.INFO)
+loggers["resources"]["logger_anubi_main"] = AnubiLogger("anubi_main", path_logger_anubi_main, log_to_stdout, "info")
+loggers["resources"]["logger_anubi_yara"] = AnubiLogger("anubi_yara", path_logger_anubi_yara, log_to_stdout, "info")
+loggers["resources"]["logger_anubi_hash"] = AnubiLogger("anubi_hash", path_logger_anubi_hash, log_to_stdout, "debug")
+loggers["resources"]["logger_anubi_ip"] = AnubiLogger("anubi_ip", path_logger_anubi_ip, log_to_stdout, "info")
+loggers["resources"]["logger_anubi_voyeur"] = AnubiLogger("anubi_voyeur", path_logger_anubi_voyeur, log_to_stdout, "info")
+loggers["resources"]["logger_anubi_management"] = AnubiLogger("anubi_management", path_logger_anubi_management, log_to_stdout, "info")
+loggers["resources"]["logger_anubi_master_exceptions"] = AnubiLogger("anubi_master_exceptions", path_logger_anubi_master_exceptions, log_to_stdout, "info")
 
 loggers["assoc"] = {}
 loggers["assoc"]["main"] = "logger_anubi_main"

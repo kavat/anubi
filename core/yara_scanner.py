@@ -7,6 +7,7 @@ import re
 import subprocess
 import sys
 import conf_anubi
+import traceback
 
 from core.common import (
   wait_for_updating,
@@ -50,7 +51,7 @@ class YaraScanner:
         except yara.SyntaxError as ey:
           config.loggers["resources"]["logger_anubi_yara"].get_logger().warn("Error on {}: {}, skipped".format(full_path_rule, ey))
         except Exception as e:
-          config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_yara"].get_logger().exception(e, traceback.format_exc())
           config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("yara load_rules() BOOM!!!")
           config.loggers["resources"]["logger_anubi_yara"].get_logger().warning("Skipped {}".format(full_path_rule))
     if os.path.isdir(config.anubi_path['custom_rule_path']) == True:
@@ -61,8 +62,8 @@ class YaraScanner:
           config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Loaded {}".format(full_path_rule))
           rules[full_path_rule] = full_path_rule
         except Exception as e:
-          config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
-          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical(e, exc_info=True)
+          config.loggers["resources"]["logger_anubi_yara"].get_logger().exception(e, traceback.format_exc())
+          config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().exception(e, traceback.format_exc())
           config.loggers["resources"]["logger_anubi_yara"].get_logger().warning("Skipped {}".format(full_path_rule))
     self.compiled_rules = yara.compile(filepaths=rules)
 
@@ -76,10 +77,11 @@ class YaraScanner:
         return self.compiled_rules.match(file_path)
       else:
         config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Error accessing {}: {}".format(file_path, check_file_access["msg"]))
-    except UnicodeEncodeError as ee:
-      config.loggers["resources"]["logger_anubi_yara"].get_logger().error("UnicodeEncodeError exception on {}: {}".format(file_path, ee))
     except yara.Error as e:
-      config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Yara.Error exception on {}: {}".format(file_path, e))      
+      config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Yara.Error exception on {}: {}".format(file_path, e))
+      pass
+    except UnicodeEncodeError as ee:
+      pass
     return []
 
 def yara_scan_file(yara_scanner, file_path, func_orig, report_filename):
@@ -126,7 +128,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
         found = found + status_yara
   except Exception as e:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during start_yara_scanner")
-    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
+    config.loggers["resources"]["logger_anubi_yara"].get_logger().exception(e, traceback.format_exc())
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("start_yara_scanner() BOOM!!!")
   config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Yara scan finished")
   config.yara_scan.set(False)
@@ -143,7 +145,7 @@ def yara_scanner_periodic_polling(yara_scanner, file_paths):
       time.sleep(20)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during yara_scanner_periodic_polling")
-    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
+    config.loggers["resources"]["logger_anubi_yara"].get_logger().exception(e, traceback.format_exc())
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("yara_scanner_periodic_polling() BOOM!!!")
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("YARA: Waiting {} for process restart".format(config.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)
@@ -165,7 +167,7 @@ def yara_scanner_polling(yara_scanner):
       time.sleep(1)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during yara_scanner_polling")
-    config.loggers["resources"]["logger_anubi_yara"].get_logger().critical(e, exc_info=True)
+    config.loggers["resources"]["logger_anubi_yara"].get_logger().exception(e, traceback.format_exc())
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("yara_scanner_polling() BOOM!!!")
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("YARA: Waiting {} for process restart".format(config.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)

@@ -34,7 +34,6 @@ def pull_repo(dst_path):
     return None
 
 def wait_for_updating(action):
-  config.loggers["resources"]["logger_anubi_" + action].get_logger().debug("Refresh rule checker started")
   if action == 'yara':
     while config.updater_yara.get_updating() == True:
       time.sleep(1)      
@@ -44,7 +43,6 @@ def wait_for_updating(action):
   if action == 'ip':
     while config.updater_ip.get_updating() == True:
       time.sleep(1)
-  config.loggers["resources"]["logger_anubi_" + action].get_logger().debug("Refresh rule checker ended")
 
 def get_platform():
   os_platform = ""
@@ -196,15 +194,15 @@ def get_current_hours_minutes():
   c = datetime.now()
   return c.strftime('%H:%M')
 
-def scan_dir(dir):
+def scan_dir(dir_):
   try:
-    for f in os.listdir(dir):
-      if os.path.isdir("{}/{}".format(dir,f)):
+    for f in os.listdir(dir_):
+      if os.path.isdir("{}/{}".format(dir_,f)):
         if f in conf_anubi.voyeur_dirs_wild:
-          config.voyeur_dir_scan.append("{}/{}".format(dir,f))
-          print("Found {}/{}".format(dir,f))
+          config.voyeur_dir_scan.append("{}/{}".format(dir_,f))
+          config.loggers["resources"]["logger_anubi_voyeur"].get_logger().info("Found {}/{}".format(dir_,f))
         else:
-          scan_dir("{}/{}".format(dir,f))
+          scan_dir("{}/{}".format(dir_,f))
   except:
     pass
 
@@ -217,8 +215,13 @@ def get_voyeur_dirs():
       top_dirs = conf_anubi.voyeur_win_top_dirs
     for top_dir in top_dirs:
       scan_dir(top_dir) 
-  if conf_anubi.voyeur_dirs_nowild != []:
-    for dir_ in conf_anubi.voyeur_dirs_nowild:
+  voyeur_dirs_nowild = []
+  if get_platform() == "linux" or get_platform() == "macos":
+    voyeur_dirs_nowild = conf_anubi.voyeur_unix_dirs_nowild
+  if get_platform() == "windows":
+    voyeur_dirs_nowild = conf_anubi.voyeur_win_dirs_nowild
+  if voyeur_dirs_nowild != []:
+    for dir_ in voyeur_dirs_nowild:
       config.voyeur_dir_scan.append(dir_)
   return config.voyeur_dir_scan
 
