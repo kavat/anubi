@@ -41,36 +41,36 @@ class AnubiLogger:
     
   def debug(self, msg):
     if self.level == "debug" or self.level == "info" or self.level == "warning" or self.level == "error" or self.level == "critical" :
-      self.write("{} - {} - debug - {}\n".format(current_datetime(), self.nome_log, self.level, msg))
+      self.write("{} - {} - debug - {}\n".format(current_datetime(), self.nome_log, msg))
     if self.log_std == True:
-      self.to_stdout("{} - {} - debug - {}".format(current_datetime(), self.nome_log, self.level, msg))
+      self.to_stdout("{} - {} - debug - {}".format(current_datetime(), self.nome_log, msg))
       
   def info(self, msg):
     if self.level == "info" or self.level == "info" or self.level == "warning" or self.level == "error" or self.level == "critical":
-      self.write("{} - {} - info - {}\n".format(current_datetime(), self.nome_log, self.level, msg))
+      self.write("{} - {} - info - {}\n".format(current_datetime(), self.nome_log, msg))
     if self.log_std == True:
-      self.to_stdout("{} - {} - info - {}".format(current_datetime(), self.nome_log, self.level, msg))
+      self.to_stdout("{} - {} - info - {}".format(current_datetime(), self.nome_log, msg))
       
   def warning(self, msg):
     if self.level == "warning" or self.level == "error" or self.level == "critical":
-      self.write("{} - {} - warning - {}\n".format(current_datetime(), self.nome_log, self.level, msg))
+      self.write("{} - {} - warning - {}\n".format(current_datetime(), self.nome_log, msg))
     if self.log_std == True:
-      self.to_stdout("{} - {} - warning - {}".format(current_datetime(), self.nome_log, self.level, msg))
+      self.to_stdout("{} - {} - warning - {}".format(current_datetime(), self.nome_log, msg))
       
   def warn(self, msg):
     self.warning(msg)
     
   def error(self, msg):
     if self.level == "error" or self.level == "critical":
-      self.write("{} - {} - error - {}\n".format(current_datetime(), self.nome_log, self.level, msg))
+      self.write("{} - {} - error - {}\n".format(current_datetime(), self.nome_log, msg))
     if self.log_std == True:
-      self.to_stdout("{} - {} - error - {}".format(current_datetime(), self.nome_log, self.level, msg))
+      self.to_stdout("{} - {} - error - {}".format(current_datetime(), self.nome_log, msg))
       
   def critical(self, msg):
     if self.level == "critical":
-      self.write("{} - {} - critical - {}\n".format(current_datetime(), self.nome_log, self.level, msg))
+      self.write("{} - {} - critical - {}\n".format(current_datetime(), self.nome_log, msg))
     if self.log_std == True:
-      self.to_stdout("{} - {} - critical - {}".format(current_datetime(), self.nome_log, self.level, msg))
+      self.to_stdout("{} - {} - critical - {}".format(current_datetime(), self.nome_log, msg))
 
   def exception(self, e_msg, e_trace):
     self.write("{} - {} - exception - {}\n".format(current_datetime(), self.nome_log, e_msg))
