@@ -43,10 +43,12 @@ User is helped by a simply webui in order to interact with Anubi (as default con
 ![Anubu WebUI](images/webui.png)
 
 ## OS supported
-Linux and MacOS are supported by Anubi; Windows will be soon.
+Linux, MacOS and Windows
 
 ## Dependencies
 External dependencies are needed:
+* WinPcap
+  * Windows: follow [official documentation](https://www.winpcap.org/install/)
 * Git
   * Linux (Debian): `apt install git-core`
   * Linux (Centos): `yum install git-core`
