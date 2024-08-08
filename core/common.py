@@ -16,6 +16,7 @@ import git
 from sys import platform as _platform
 from datetime import datetime
 
+
 def clone_repo(repo_name, dst_path):
   try:
     return git.Repo.clone_from(repo_name, dst_path)

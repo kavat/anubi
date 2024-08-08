@@ -109,6 +109,20 @@ def yara_scan_file(yara_scanner, file_path, func_orig, report_filename):
     pass
   return found_
 
+def yara_scan_single_file(yara_scanner, file_path, func_orig):
+  found_ = []
+  try:
+    matches = yara_scanner.check(file_path)
+    if matches != []:
+      for found in matches:
+        config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
+        found_append(found)
+    else:
+      config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().info("{} cleaned".format(file_path))
+  except FileNotFoundError:
+    pass
+  return found_
+
 def start_yara_scanner(yara_scanner, file_paths, report_filename):
   config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Check for updating status")
   wait_for_updating('yara')

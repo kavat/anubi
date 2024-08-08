@@ -62,7 +62,11 @@ class HashScanner:
         try:
           with open(full_path_hash) as f:
             for line in f:
-              self.hash_tables[line.rstrip().split(":")[0]] = line.rstrip().split(":")[1]
+              try:
+                self.hash_tables[line.rstrip().split(":")[0]] = line.rstrip().split(":")[1]
+              except Exception as ee:
+                config.loggers["resources"]["logger_anubi_hash"].get_logger().warning("Error on {}".format(line.rstrip()))
+                config.loggers["resources"]["logger_anubi_hash"].get_logger().exception(ee, traceback.format_exc())
           config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Loaded {}".format(full_path_hash))
         except Exception as e:
           config.loggers["resources"]["logger_anubi_hash"].get_logger().exception(e, traceback.format_exc())
@@ -105,6 +109,19 @@ def hash_scan_file(hash_scanner, file_path, func_orig, report_filename):
     else:
       config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} discarded".format(file_path))
       #write_report(report_filename, "{} discarded".format(file_path)) 
+  except FileNotFoundError:
+    pass
+  return found
+
+def hash_scan_single_file(hash_scanner, file_path, func_orig):
+  found = ""
+  try:
+    matches = hash_scanner.check(file_path)
+    if matches != "":
+      config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Malware {} matched for {}".format(matches, file_path))
+      found = matches
+    else:
+      config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
   except FileNotFoundError:
     pass
   return found
