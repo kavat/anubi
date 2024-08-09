@@ -76,6 +76,22 @@ class IpChecker:
           config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().exception(e, traceback.format_exc())
           config.loggers["resources"]["logger_anubi_ip"].get_logger().warning("Skipped {}".format(full_path_ip))
 
+  def scan_network_flow(self, src, sport, dst, dport, proto):
+    ritorno = "clean"
+    if dst in self.ip_tables and ipaddress.ip_address(dst).is_private == False:
+      if dst not in conf_anubi.ip_whitelist:
+        config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("dst {}:{}/{} found from src {}:{} ({} with risk {})".format(dst, dport, proto, src, sport, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
+        ritorno = "Destination {} with risk {}".format(self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"])
+      else:
+        config.loggers["resources"]["logger_anubi_ip"].get_logger().debug("dst {}:{}/{} found from src {}:{} ({} with risk {} but whitelisted)".format(dst, dport, proto, src, sport, self.ip_tables[dst]["tag_name"], self.ip_tables[dst]["risk"]))
+    if src in self.ip_tables and ipaddress.ip_address(src).is_private == False:
+      if src not in conf_anubi.ip_whitelist:
+        config.loggers["resources"]["logger_anubi_ip"].get_logger().critical("src {}:{}/{} found to dst {}:{} ({} with risk {})".format(src, sport, proto, dst, dport, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
+        ritorno = "Source {} with risk {}".format(self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"])
+      else:
+        config.loggers["resources"]["logger_anubi_ip"].get_logger().debug("src {}:{}/{} found to dst {}:{} ({} with risk {} but whitelisted)".format(src, sport, proto, dst, dport, self.ip_tables[src]["tag_name"], self.ip_tables[src]["risk"]))
+    return ritorno
+
   def sniff(self, interface):
     config.loggers["resources"]["logger_anubi_ip"].get_logger().info("Starting sniffer on {}".format(interface))
     scapy.all.sniff(iface=interface, store=False, prn=self.process_sniffed_packet)
