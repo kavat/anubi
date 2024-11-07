@@ -116,7 +116,7 @@ def yara_scan_single_file(yara_scanner, file_path, func_orig):
     if matches != []:
       for found in matches:
         config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
-        found_append(found)
+        found.append(found)
     else:
       config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().info("{} cleaned".format(file_path))
   except FileNotFoundError:
