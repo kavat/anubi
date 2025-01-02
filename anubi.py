@@ -29,10 +29,10 @@ from core.fs_voyeur import (
   FsVoyeur,
   fs_voyeur_polling
 )
-from core.syscall_scanner import (
-  SysCallScanner,
-  syscall_scanner_polling
-)
+#from core.syscall_scanner import (
+#  SysCallScanner,
+#  syscall_scanner_polling
+#)
 from core.api import (
   start_api,
   refresh_by_api
@@ -129,7 +129,8 @@ if args.file:
     sys.exit(1)
 
 if args.syscall:
-  syscall_scanner_polling(SysCallScanner())
+  print("Work in progess..")
+  #syscall_scanner_polling(SysCallScanner())
   sys.exit(1)
 
 if args.start == True or args.start_full == True:
@@ -152,7 +153,6 @@ if args.start == True or args.start_full == True:
 
     config.scanners['yara_scanner'] = YaraScanner()
     config.scanners['hash_scanner'] = HashScanner()
-    config.scanners['syscall_scanner'] = SysCallScanner()
     config.scanners['ip_checker'] = IpChecker()
 
     if 'yara' in config.conf_anubi and config.conf_anubi['yara'] == 'Y':
