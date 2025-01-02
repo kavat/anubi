@@ -37,3 +37,4 @@ ip_whitelist = ["192.229.221.95"]
 # SUFFIX REPORT NAMES
 yara_report_suffix = "yara"
 hash_report_suffix = "hash"
+syscall_report_suffix = "syscall"

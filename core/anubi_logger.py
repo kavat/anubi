@@ -5,100 +5,62 @@ import os
 
 from core.common import current_datetime
 
+
 class AnubiLogger:
+    def __init__(self, nome_log, path_log, log_std=True, log_level="INFO"):
+      self.nome_log = nome_log
+      self.path_log = self._prepare_log_path(path_log)
+      self.log_std = log_std
+      self.logger = logging.getLogger(nome_log)
+      self._configure_logger(log_level)
 
-  def __init__(self, nome_log, path_log, log_std, log_level):
-    self.path_log = self.create_log_path(path_log)
-    self.nome_log = nome_log
-    self.log_std = log_std
-    self.logger = self.forge_logger('a')
-    if self.logger == False:
-      sys.exit(1)
-    self.level = log_level
-    self.log_std = log_std
-    
-  def forge_logger(self, mode):
-    if self.path_log != "":
-      try:
-        return open(self.path_log, mode)
-      except Exception as e:
-        print("Unable to return logger {}: {}".format(self.path_log, e))
-    return False
+    def _prepare_log_path(self, path_log):
+      dir_path = os.path.dirname(path_log)
+      if dir_path and not os.path.exists(dir_path):
+        os.makedirs(dir_path, exist_ok=True)
+      return path_log
 
-  def create_log_path(self, path_log):
-    if os.path.isdir(os.path.dirname(path_log)) == False:
-      os.mkdir(os.path.dirname(path_log))
-    return path_log
+    def _configure_logger(self, log_level):
+      self.logger.setLevel(getattr(logging, log_level.upper(), logging.INFO))
 
-  def wipe(self):
-    self.logger = self.forge_logger('w')
+      file_handler = logging.FileHandler(self.path_log)
+      file_handler.setFormatter(self._get_formatter())
+      self.logger.addHandler(file_handler)
 
-  def get_logger(self):
-    return self 
+      if self.log_std:
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setFormatter(self._get_formatter())
+        self.logger.addHandler(console_handler)
 
-  def set_level(self, log_level):
-    self.level = log_level
-    
-  def debug(self, msg):
-    if self.level == "debug" or self.level == "info" or self.level == "warning" or self.level == "error" or self.level == "critical" :
-      self.write("{} - {} - debug - {}\n".format(current_datetime(), self.nome_log, msg))
-    if self.log_std == True:
-      self.to_stdout("{} - {} - debug - {}".format(current_datetime(), self.nome_log, msg))
-      
-  def info(self, msg):
-    if self.level == "info" or self.level == "info" or self.level == "warning" or self.level == "error" or self.level == "critical":
-      self.write("{} - {} - info - {}\n".format(current_datetime(), self.nome_log, msg))
-    if self.log_std == True:
-      self.to_stdout("{} - {} - info - {}".format(current_datetime(), self.nome_log, msg))
-      
-  def warning(self, msg):
-    if self.level == "warning" or self.level == "error" or self.level == "critical":
-      self.write("{} - {} - warning - {}\n".format(current_datetime(), self.nome_log, msg))
-    if self.log_std == True:
-      self.to_stdout("{} - {} - warning - {}".format(current_datetime(), self.nome_log, msg))
-      
-  def warn(self, msg):
-    self.warning(msg)
-    
-  def error(self, msg):
-    if self.level == "error" or self.level == "critical":
-      self.write("{} - {} - error - {}\n".format(current_datetime(), self.nome_log, msg))
-    if self.log_std == True:
-      self.to_stdout("{} - {} - error - {}".format(current_datetime(), self.nome_log, msg))
-      
-  def critical(self, msg):
-    if self.level == "critical":
-      self.write("{} - {} - critical - {}\n".format(current_datetime(), self.nome_log, msg))
-    if self.log_std == True:
-      self.to_stdout("{} - {} - critical - {}".format(current_datetime(), self.nome_log, msg))
+    def _get_formatter(self):
+      return logging.Formatter(
+        fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+      )
 
-  def exception(self, e_msg, e_trace):
-    self.write("{} - {} - exception - {}\n".format(current_datetime(), self.nome_log, e_msg))
-    if self.log_std == True:
-      self.to_stdout("{} - {} - exception - {}".format(current_datetime(), self.nome_log, e_msg))
-    for riga in e_trace.split("\n"):
-      self.write("{} - {} - trace - {}\n".format(current_datetime(), self.nome_log, riga))
-      if self.log_std == True:
-        self.to_stdout("{} - {} - trace - {}".format(current_datetime(), self.nome_log, riga))
+    def set_level(self, log_level):
+      self.logger.setLevel(getattr(logging, log_level.upper(), logging.INFO))
 
-  def write(self, msg):
-    try:
-      self.logger.write(msg)
-    except UnicodeEncodeError:
-      try:
-        self.logger.write(byte(msg, 'utf-8').decode('utf-8', 'ignore'))
-      except:
-        print("Unable to write log {} for UnicodeEncodeError".format(self.nome_log))
-      #print("Unable to write log {} for UnicodeEncodeError: {}".format(self.nome_log, msg))
-      pass
-   
-  def to_stdout(self, msg):
-    try:
-      print(msg)
-    except UnicodeEncodeError:
-      try:
-        print(byte(msg, 'utf-8').decode('utf-8', 'ignore'))
-      except:
-        print("Unable to print ti stdout log {} for UnicodeEncodeError".format(self.nome_log))
-      #print("Unable to write log {} for UnicodeEncodeError: {}".format(self.nome_log, msg))
-      pass
+    def wipe(self):
+      open(self.path_log, "w").close()
+
+    def debug(self, msg):
+      self.logger.debug(msg)
+
+    def info(self, msg):
+      self.logger.info(msg)
+
+    def warning(self, msg):
+      self.logger.warning(msg)
+
+    def error(self, msg):
+      self.logger.error(msg)
+
+    def critical(self, msg):
+      self.logger.critical(msg)
+
+    def exception(self, msg):
+      self.logger.exception(msg, exc_info=True)
+
+    def get_logger(self):
+      return self.logger

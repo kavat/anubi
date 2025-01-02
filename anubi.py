@@ -29,6 +29,10 @@ from core.fs_voyeur import (
   FsVoyeur,
   fs_voyeur_polling
 )
+from core.syscall_scanner import (
+  SysCallScanner,
+  syscall_scanner_polling
+)
 from core.api import (
   start_api,
   refresh_by_api
@@ -64,9 +68,10 @@ parser.add_argument('--refresh-yara', action='store_true', help='Reload yara rul
 parser.add_argument('--refresh-hash', action='store_true', help='Reload hash rules, this action will use the already present ones, please download the newest before')
 parser.add_argument('--refresh-ip', action='store_true', help='Reload IP, this action will use the already present ones, please download the newest before')
 parser.add_argument('--file', action='store', type=str, help='File fullpath')
+parser.add_argument('--syscall', action='store_true', help='Monitor Syscall on Linux')
 args = parser.parse_args()
 
-if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None:
+if args.syscall == False and args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None:
   print("Run with argument or -h/--help")
   sys.exit(1)
 
@@ -123,6 +128,10 @@ if args.file:
   else:
     sys.exit(1)
 
+if args.syscall:
+  syscall_scanner_polling(SysCallScanner())
+  sys.exit(1)
+
 if args.start == True or args.start_full == True:
 
   if args.start_full == True:
@@ -143,6 +152,7 @@ if args.start == True or args.start_full == True:
 
     config.scanners['yara_scanner'] = YaraScanner()
     config.scanners['hash_scanner'] = HashScanner()
+    config.scanners['syscall_scanner'] = SysCallScanner()
     config.scanners['ip_checker'] = IpChecker()
 
     if 'yara' in config.conf_anubi and config.conf_anubi['yara'] == 'Y':
