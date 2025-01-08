@@ -193,7 +193,10 @@ if args.start == True or args.start_full == True:
       msgbox_managed = []
       try:
         for msg_id in config.msgbox:
-          MsgBox(config.msgbox[msg_id]["title"], config.msgbox[msg_id]["msg"])
+          try:
+            MsgBox(config.msgbox[msg_id]["title"], config.msgbox[msg_id]["msg"])
+          except:
+            config.loggers["resources"]["logger_anubi_main"].get_logger().error("Unable to create MsgBox")
           msgbox_managed.append(msg_id)
         for msg_id in msgbox_managed:
           try:

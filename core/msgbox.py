@@ -5,6 +5,7 @@ from pynotifier.backends import platform
 from config import get_application_path
 
 class MsgBox:
+
   def __init__(self, title, message):
     c = pynotifier.NotificationClient()
     c.register_backend(platform.Backend())
