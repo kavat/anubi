@@ -1,3 +1,0 @@
-git clone https://github.com/vstinner/python-ptrace.git
-cd python-ptrace
-python3 setup.py install
