@@ -15,7 +15,8 @@ from core.common import (
   get_current_hours_minutes,
   id_generator,
   write_report,
-  write_stats
+  write_stats,
+  test_file
 )
 
 class HashScan:
@@ -134,13 +135,17 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
   try:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Hash scan started")
     for file_path in file_paths:
-      if os.path.isdir(file_path):
-        file_path_dir = pathlib.Path(file_path)
-        for file_path_rec in file_path_dir.rglob("*"):
-          if os.path.isfile(str(file_path_rec)):
-            found = found + hash_scan_file(hash_scanner, str(file_path_rec), 'hash', report_filename)
-      if os.path.isfile(file_path):
-        found = found + hash_scan_file(hash_scanner, file_path, 'hash', report_filename)
+      try:
+        if os.path.isdir(file_path):
+          file_path_dir = pathlib.Path(file_path)
+          if file_exclusions(file_path_dir) == False:
+            for file_path_rec in file_path_dir.rglob("*"):
+              if os.path.isfile(str(file_path_rec)):
+                found = found + hash_scan_file(hash_scanner, str(file_path_rec), 'hash', report_filename)
+        if os.path.isfile(file_path):
+          found = found + hash_scan_file(hash_scanner, file_path, 'hash', report_filename)
+      except FileNotFoundError:
+        pass
   except Exception as e:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during start_hash_scanner")
     config.loggers["resources"]["logger_anubi_hash"].get_logger().exception(e, traceback.format_exc())
@@ -182,7 +187,8 @@ def hash_scanner_polling(hash_scanner):
       time.sleep(1)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during hash_scanner_polling")
-    config.loggers["resources"]["logger_anubi_hash"].get_logger().exception(e, traceback.format_exc())
+    config.loggers["resources"]["logger_anubi_hash"].get_logger().exception(e)
+    print(traceback.format_exc())
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("hash_scanner_polling() BOOM!!!")
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("HASH: Waiting {} for process restart".format(config.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)

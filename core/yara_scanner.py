@@ -133,10 +133,11 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
     for file_path in file_paths:
       if os.path.isdir(file_path):
         file_path_dir = pathlib.Path(file_path)
-        for file_path_rec in file_path_dir.rglob("*"):
-          if os.path.isfile(str(file_path_rec)):
-            status_yara = yara_scan_file(yara_scanner, str(file_path_rec), 'yara', report_filename)
-            found = found + status_yara
+        if file_exclusions(file_path_dir) == False:
+          for file_path_rec in file_path_dir.rglob("*"):
+            if os.path.isfile(str(file_path_rec)):
+              status_yara = yara_scan_file(yara_scanner, str(file_path_rec), 'yara', report_filename)
+              found = found + status_yara
       if os.path.isfile(file_path):
         status_yara = yara_scan_file(yara_scanner, file_path, 'yara', report_filename)
         found = found + status_yara
@@ -181,7 +182,8 @@ def yara_scanner_polling(yara_scanner):
       time.sleep(1)
   except Exception as e:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during yara_scanner_polling")
-    config.loggers["resources"]["logger_anubi_yara"].get_logger().exception(e, traceback.format_exc())
+    config.loggers["resources"]["logger_anubi_yara"].get_logger().exception(e)
+    print(traceback.format_exc())
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("yara_scanner_polling() BOOM!!!")
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("YARA: Waiting {} for process restart".format(config.sleep_thread_restart))
     time.sleep(config.sleep_thread_restart)
