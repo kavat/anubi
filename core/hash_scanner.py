@@ -138,7 +138,7 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
       try:
         if os.path.isdir(file_path):
           file_path_dir = pathlib.Path(file_path)
-          if file_exclusions(file_path_dir) == False:
+          if file_exclusions(str(file_path_dir)) == False:
             for file_path_rec in file_path_dir.rglob("*"):
               if os.path.isfile(str(file_path_rec)):
                 found = found + hash_scan_file(hash_scanner, str(file_path_rec), 'hash', report_filename)

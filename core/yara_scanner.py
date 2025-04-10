@@ -133,7 +133,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
     for file_path in file_paths:
       if os.path.isdir(file_path):
         file_path_dir = pathlib.Path(file_path)
-        if file_exclusions(file_path_dir) == False:
+        if file_exclusions(str(file_path_dir)) == False:
           for file_path_rec in file_path_dir.rglob("*"):
             if os.path.isfile(str(file_path_rec)):
               status_yara = yara_scan_file(yara_scanner, str(file_path_rec), 'yara', report_filename)
