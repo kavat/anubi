@@ -22,7 +22,7 @@ IOC scan is a passive monitoring on the filesystem root applying Yara rules gene
 Hash scan is a passive monitoring on the filesystem root applying Hash rules generated in [my official repo](https://github.com/kavat/anubi-signatures/tree/main/hash)
 
 ### IP checker
-IP checker is an active monitoring of a particular ethernet interface applying IP rules generated in [my official repo](https://github.com/kavat/anubi-signatures/tree/main/ip)
+IP checker is an active monitoring of a particular ethernet interface applying IP rules generated in [my official repo](https://github.com/kavat/anubi-signatures/tree/main/ips)
 
 ### Filesystem modifications (Voyeur)
 Voyeur is an active monitoring on the filesystem directories specified applying [Yara](https://github.com/kavat/anubi-signatures/tree/main/yara) and [Hash](https://github.com/kavat/anubi-signatures/tree/main/hash) rules
@@ -38,7 +38,7 @@ Command to connect with API system `curl http://127.0.0.1:5555/api?func=help` pr
 * force_hash_scan, `http://127.0.0.1:5555/api?func=force_hash_scan&dir=url_encoded_dir` forces a hash scan (dir parameter shall be url-encoded)
 * report, `http://127.0.0.1:5555/api?func=report&dir=report_type` requires and prints the report for the current day for the selected type (yara, hash, voyeur or ips)
 
-User is helped by a simply webui in order to interact with Anubi (as default console is reacheable at http://127.0.0.:5555)
+User is helped by a simply webui in order to interact with Anubi (as default console is reacheable at http://127.0.0.1:5555)
 
 ![Anubu WebUI](images/webui.png)
 
