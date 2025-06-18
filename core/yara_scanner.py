@@ -142,17 +142,24 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
               new_dirs.append(d)
             except PermissionError:
               print(f"Permission denied: {full_path}")
+            except FileNotFoundError:
+              pass
           dirs[:] = new_dirs  # Modifica dirs in-place per evitare discesa
 
           for file in files:
             if file_exclusions(f"{Path(root) / file}") == False:
-              #print(Path(root) / file)
-              status_yara = yara_scan_file(yara_scanner, f"{Path(root) / file}", 'yara', report_filename)
-              found = found + status_yara
+              try:
+                status_yara = yara_scan_file(yara_scanner, f"{Path(root) / file}", 'yara', report_filename)
+                found = found + status_yara
+              except FileNotFoundError:
+                pass
 
       if os.path.isfile(file_path) and file_exclusions(file_path) == False:
-        status_yara = yara_scan_file(yara_scanner, file_path, 'yara', report_filename)
-        found = found + status_yara
+        try:
+          status_yara = yara_scan_file(yara_scanner, file_path, 'yara', report_filename)
+          found = found + status_yara
+        except FileNotFoundError:
+          pass
 
   except Exception as e:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().critical("Error during start_yara_scanner")
