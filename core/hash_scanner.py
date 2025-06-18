@@ -134,15 +134,28 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
   found = 0
   try:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Hash scan started")
+
     for file_path in file_paths:
-      try:
-        if os.path.isdir(file_path):
-          file_path_dir = pathlib.Path(file_path)
-          if file_exclusions(str(file_path_dir)) == False:
-            for file_path_rec in file_path_dir.rglob("*"):
-              if os.path.isfile(str(file_path_rec)):
-                found = found + hash_scan_file(hash_scanner, str(file_path_rec), 'hash', report_filename)
-        if os.path.isfile(file_path):
+
+      if os.path.isdir(file_path) and file_path(file_path) == False:
+
+        for root, dirs, files in os.walk(file_path, topdown=True):
+          new_dirs = []
+          for d in dirs:
+            full_path = Path(root) / d
+            try:
+              _ = list(os.scandir(full_path))  # Tenta accesso per verificare permessi
+              new_dirs.append(d)
+            except PermissionError:
+              print(f"Permission denied: {full_path}")
+          dirs[:] = new_dirs  # Modifica dirs in-place per evitare discesa
+
+          for file in files:
+            if file_exclusions(f"{Path(root) / file}") == False:
+              found = found + hash_scan_file(hash_scanner, f"{Path(root) / file}", 'hash', report_filename)
+              found = found + status_yara
+
+        if os.path.isfile(file_path) and file_path(file_path) == False:
           found = found + hash_scan_file(hash_scanner, file_path, 'hash', report_filename)
       except FileNotFoundError:
         pass
