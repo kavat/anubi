@@ -19,6 +19,8 @@ from core.common import (
   test_file
 )
 
+from pathlib import Path
+
 class HashScan:
 
   status = False
@@ -137,7 +139,7 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
 
     for file_path in file_paths:
 
-      if os.path.isdir(file_path) and file_path(file_path) == False:
+      if os.path.isdir(file_path) and os.path.isfile(file_path) == False:
 
         for root, dirs, files in os.walk(file_path, topdown=True):
           new_dirs = []
@@ -172,6 +174,7 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
   config.hash_scan.set(False)
   if found > 0:
     config.msgbox[id_generator(10)] = {"title": "Periodic Hash scan", "msg": "Malware detected, please check reports or logs"}
+  return found
 
 def hash_scanner_periodic_polling(hash_scanner, file_paths):
   try:

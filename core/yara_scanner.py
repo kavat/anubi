@@ -19,6 +19,8 @@ from core.common import (
   test_file
 )
 
+from pathlib import Path
+
 class YaraScan:
 
   status = False
@@ -131,7 +133,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
   try:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Yara scan started")
     for file_path in file_paths:
-      if os.path.isdir(file_path) and file_path(file_path) == False:
+      if os.path.isdir(file_path) and os.path.isfile(file_path) == False:
         
         for root, dirs, files in os.walk(file_path, topdown=True):
           new_dirs = []
@@ -149,6 +151,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
           for file in files:
             if file_exclusions(f"{Path(root) / file}") == False:
               try:
+                print(f"Esamino {Path(root) / file}")
                 status_yara = yara_scan_file(yara_scanner, f"{Path(root) / file}", 'yara', report_filename)
                 found = found + status_yara
               except FileNotFoundError:
@@ -156,6 +159,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
 
       if os.path.isfile(file_path) and file_exclusions(file_path) == False:
         try:
+          print(f"Esamino {filepath}")
           status_yara = yara_scan_file(yara_scanner, file_path, 'yara', report_filename)
           found = found + status_yara
         except FileNotFoundError:
@@ -169,6 +173,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
   config.yara_scan.set(False)
   if found > 0:
     config.msgbox[id_generator(10)] = {"title": "Periodic Yara scan", "msg": "IOC detected, please check reports or logs"}
+  return found
 
 def yara_scanner_periodic_polling(yara_scanner, file_paths):
   try:

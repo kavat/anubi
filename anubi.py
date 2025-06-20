@@ -45,7 +45,7 @@ from core.common import (
   is_root,
   id_generator
 )
-from core.external_interactions import analyze_single_file
+from core.external_interactions import analyze_single_file_or_directory
 from core.msgbox import MsgBox
 from argparse import ArgumentParser
 
@@ -64,13 +64,14 @@ parser.add_argument('--refresh-yara', action='store_true', help='Reload yara rul
 parser.add_argument('--refresh-hash', action='store_true', help='Reload hash rules, this action will use the already present ones, please download the newest before')
 parser.add_argument('--refresh-ip', action='store_true', help='Reload IP, this action will use the already present ones, please download the newest before')
 parser.add_argument('--file', action='store', type=str, help='File fullpath')
+parser.add_argument('--dir', action='store', type=str, help='Directory fullpath')
 args = parser.parse_args()
 
-if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None:
+if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None and args.dir == None:
   print("Run with argument or -h/--help")
   sys.exit(1)
 
-if is_root() == 0 and args.file == None:
+if is_root() == 0 and (args.file == None or args.dir == None):
   print("Run as root")
   sys.exit(1)
 
@@ -115,7 +116,22 @@ if (args.start == True or args.start_full == True) and args.file == True:
   print("Can not use --start or --start-full with --file, use one")
   sys.exit(1)
 
-if args.file:
+if (args.start == True or args.start_full == True) and args.dir == True:
+  print("Can not use --start or --start-full with --dir, use one")
+  sys.exit(1)
+
+if args.file or args.dir:
+  if args.file:
+    r = analyze_single_file_or_directory(args.file)
+  if args.dir:
+    r = analyze_single_file_or_directory(args.dir)
+  print(r)
+  if r['status'] == True:
+    sys.exit(0)
+  else:
+    sys.exit(1)
+
+if args.dir:
   r = analyze_single_file(args.file)
   print(r)
   if r['status'] == True:
