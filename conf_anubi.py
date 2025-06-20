@@ -29,10 +29,10 @@ max_file_size = 52428800
 yara_whitelist = ["SurtrStrings", "Surtr"]
 
 # HASH WHITELIST
-hash_whitelist = ["1ebbd3e34237af26da5dc08a4e440464"]
+hash_whitelist = []
 
 # IP WHITELIST
-ip_whitelist = ["192.229.221.95"]
+ip_whitelist = []
 
 # SUFFIX REPORT NAMES
 yara_report_suffix = "yara"

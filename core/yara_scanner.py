@@ -151,7 +151,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
           for file in files:
             if file_exclusions(f"{Path(root) / file}") == False:
               try:
-                print(f"Esamino {Path(root) / file}")
+                #print(f"Esamino {Path(root) / file}")
                 status_yara = yara_scan_file(yara_scanner, f"{Path(root) / file}", 'yara', report_filename)
                 found = found + status_yara
               except FileNotFoundError:
@@ -159,7 +159,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
 
       if os.path.isfile(file_path) and file_exclusions(file_path) == False:
         try:
-          print(f"Esamino {filepath}")
+          #print(f"Esamino {filepath}")
           status_yara = yara_scan_file(yara_scanner, file_path, 'yara', report_filename)
           found = found + status_yara
         except FileNotFoundError:
