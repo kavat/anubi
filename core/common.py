@@ -77,19 +77,21 @@ def get_hash_file(file_path):
   return (None, None, None)
 
 def file_exclusions(file_path):
-  if get_platform() == "linux" or get_platform() == "macos":
-    for exclusion in conf_anubi.linux_dir_exclusions:
-      if file_path.startswith(exclusion) == True:
-        return True
-  if file_path.startswith(config.application_path):
-    return True
-  file_extension = re.search('\.[^\/\.]+$', file_path)
-  if file_extension:
-    if file_extension.group(0) in conf_anubi.extension_exclusions:
+  if os.path.isfile(file_path):
+    if get_platform() == "linux" or get_platform() == "macos":
+      for exclusion in conf_anubi.linux_dir_exclusions:
+        if file_path.startswith(exclusion) == True:
+          return True
+    if file_path.startswith(config.application_path):
       return True
-  if os.path.getsize(file_path) > conf_anubi.max_file_size:
-    return True
-  return False
+    file_extension = re.search('\.[^\/\.]+$', file_path)
+    if file_extension:
+      if file_extension.group(0) in conf_anubi.extension_exclusions:
+        return True
+    if os.path.getsize(file_path) > conf_anubi.max_file_size:
+      return True
+    return False
+  return true
 
 def loop_until_input(message, accepted):
   r = ""
