@@ -91,7 +91,7 @@ def file_exclusions(file_path):
     if os.path.getsize(file_path) > conf_anubi.max_file_size:
       return True
     return False
-  return true
+  return True
 
 def loop_until_input(message, accepted):
   r = ""
