@@ -139,7 +139,7 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
 
     for file_path in file_paths:
 
-      if os.path.isdir(file_path) and os.path.isfile(file_path) == False:
+      if os.path.isdir(file_path):
 
         for root, dirs, files in os.walk(file_path, topdown=True):
           new_dirs = []
@@ -161,7 +161,7 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
               except FileNotFoundError:
                 pass
 
-        if os.path.isfile(file_path) and file_path(file_path) == False:
+        if os.path.isfile(file_path) and file_exclusions(file_path) == False:
           try:
             found = found + hash_scan_file(hash_scanner, file_path, 'hash', report_filename)
           except FileNotFoundError:

@@ -133,7 +133,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
   try:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Yara scan started")
     for file_path in file_paths:
-      if os.path.isdir(file_path) and os.path.isfile(file_path) == False:
+      if os.path.isdir(file_path):
         
         for root, dirs, files in os.walk(file_path, topdown=True):
           new_dirs = []
