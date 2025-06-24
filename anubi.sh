@@ -5,7 +5,7 @@ APP_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 APP_PATH="${APP_DIR}/anubi.py"
 CONF_PATH="${APP_DIR}/conf_anubi.py"
 JSON_PATH="${APP_DIR}/conf/json"
-LOG_PATH="${APP_DIR}/var/log"
+LOG_PATH="${APP_DIR}/log"
 PATH_ANUBI_SIGNATURES="${APP_DIR}/../anubi-signatures"
 PATH_VENV="${APP_DIR}/anubi_env/"
 MANAGEMENT_HOST=$(cat ${CONF_PATH} | grep management_host | awk -F' = ' '{print $2}' | sed "s/\"//g")
