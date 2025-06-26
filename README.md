@@ -67,6 +67,9 @@ External dependencies are needed:
 * YARA
   * Linux/Windows: follow [official documentation](https://yara.readthedocs.io/en/stable/gettingstarted.html) 
   * MacOS: `brew install yara`
+* SSHFs
+  * Linux (Debian): `apt install sshfs`
+  * Linux (Centos): `yum install sshfs`
 
 Relating to Pip modules, user can install dependecies through `pip install -r pip_requirements.txt`
 
@@ -82,14 +85,21 @@ In order to print full options, run Anubi with --help; the following options wil
 ![Anubu help](images/anubi_help.png)
 
 In details, options available are the following:
-*  -h, --help       used to show the current help message and exit
-*  --check-conf     used to check the current configuration and exit
-*  --check-struct   used to check Anubi directory structure and exit
-*  --create-struct  used to create Anubi directory structure needed and exit
-*  --init           used to init runtime.dat configuration file in order to set features to protect us and exit
-*  --start          used to start Anubi with configuration created and rules already present
-*  --start-full     used to start Anubi with configuration created (if runtime.dat is not present, it will be created before starting), rules will be downloaded or updated
-*  --wipe           used to erase Anubi logs and exit
+*  -h, --help                 show this help message and exit
+*  --check-conf               Check current configuration
+*  --check-struct             Check Anubi directory structure
+*  --create-struct            Create Anubi directory structure
+*  --init                     Init configuration
+*  --start                    Start Anubi with configuration created and rules already present
+*  --start-full               Start Anubi with configuration created downloading last rules
+*  --wipe                     Wipe Anubi logs
+*  --refresh-yara             Reload yara rules, this action will use the already present ones, please download the newest before
+*  --refresh-hash             Reload hash rules, this action will use the already present ones, please download the newest before
+*  --refresh-ip               Reload IP, this action will use the already present ones, please download the newest before
+*  --file FILE                File to check fullpath
+*  --dir DIR                  Directory to check fullpath
+*  --ip-remote IP_REMOTE      Remote IP to check through SSH
+*  --user-remote USER_REMOTE  User to use for checking IP remote through SSH
 
 Remember to run always as **root** user!
 

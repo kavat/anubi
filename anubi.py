@@ -46,8 +46,10 @@ from core.common import (
   id_generator
 )
 from core.external_interactions import analyze_single_file_or_directory
+
 from core.msgbox import MsgBox
 from argparse import ArgumentParser
+from subprocess import call
 
 parser = ArgumentParser(
                     prog='Anubi',
@@ -63,8 +65,10 @@ parser.add_argument('--wipe', action='store_true', help='Wipe Anubi logs')
 parser.add_argument('--refresh-yara', action='store_true', help='Reload yara rules, this action will use the already present ones, please download the newest before')
 parser.add_argument('--refresh-hash', action='store_true', help='Reload hash rules, this action will use the already present ones, please download the newest before')
 parser.add_argument('--refresh-ip', action='store_true', help='Reload IP, this action will use the already present ones, please download the newest before')
-parser.add_argument('--file', action='store', type=str, help='File fullpath')
-parser.add_argument('--dir', action='store', type=str, help='Directory fullpath')
+parser.add_argument('--file', action='store', type=str, help='File to check fullpath')
+parser.add_argument('--dir', action='store', type=str, help='Directory to check fullpath')
+parser.add_argument('--ip-remote', action='store', type=str, help='Remote IP to check through SSH')
+parser.add_argument('--user-remote', action='store', type=str, help='User to use for checking IP remote through SSH')
 args = parser.parse_args()
 
 if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None and args.dir == None:
@@ -116,23 +120,28 @@ if (args.start == True or args.start_full == True) and args.file == True:
   print("Can not use --start or --start-full with --file, use one")
   sys.exit(1)
 
-if (args.start == True or args.start_full == True) and args.dir == True:
-  print("Can not use --start or --start-full with --dir, use one")
-  sys.exit(1)
+if args.ip_remote:
+  result = call("which sshfs", shell=True)
+  if result > 0:
+    print("Unable to proceed because sshfs command is not found")
+    sys.exit(1)
+  if args.user_remote:
+    if os.path.exists("/remotes/{}".format(args.ip_remote)) == False:
+      rc = call("mkdir -p /remotes/{}".format(args.ip_remote), shell=True)
+    rc = call("sshfs -o allow_other,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 {}@{}:/ /remotes/{}".format(args.user_remote, args.ip_remote, args.ip_remote), shell=True)
+    if rc != 0:
+      print("Unable to mount {} filesystem through SSH with user {}".format(args.ip_remote, args.user_remote))
+      sys.exit(1)
+    args.dir = "/remotes/{}".format(args.ip_remote)
+  else:
+    print("Option --user-remote not found, user missed for {}".format(args.ip_remote))
+    sys.exit(1)
 
 if args.file or args.dir:
   if args.file:
     r = analyze_single_file_or_directory(args.file)
   if args.dir:
     r = analyze_single_file_or_directory(args.dir)
-  print(r)
-  if r['status'] == True:
-    sys.exit(0)
-  else:
-    sys.exit(1)
-
-if args.dir:
-  r = analyze_single_file(args.file)
   print(r)
   if r['status'] == True:
     sys.exit(0)
