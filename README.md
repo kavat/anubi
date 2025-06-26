@@ -68,8 +68,8 @@ External dependencies are needed:
   * Linux/Windows: follow [official documentation](https://yara.readthedocs.io/en/stable/gettingstarted.html) 
   * MacOS: `brew install yara`
 * SSHFs
-  * Linux (Debian): `apt install sshfs`
-  * Linux (Centos): `yum install sshfs`
+  * Linux (Debian): `apt install sshfs sshpass`
+  * Linux (Centos): `yum install sshfs sshpass`
 
 Relating to Pip modules, user can install dependecies through `pip install -r pip_requirements.txt`
 

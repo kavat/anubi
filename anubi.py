@@ -121,14 +121,15 @@ if (args.start == True or args.start_full == True) and args.file == True:
   sys.exit(1)
 
 if args.ip_remote:
-  result = call("which sshfs", shell=True)
+  result = call("which sshfs && which sshpass", shell=True)
   if result > 0:
-    print("Unable to proceed because sshfs command is not found")
+    print("Unable to proceed because sshfs or sshpass commands are not found")
     sys.exit(1)
   if args.user_remote:
     if os.path.exists("./remotes/{}".format(args.ip_remote)) == False:
       rc = call("mkdir -p ./remotes/{}".format(args.ip_remote), shell=True)
-    rc = call("sshfs -o allow_other,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 {}@{}:/ ./remotes/{}".format(args.user_remote, args.ip_remote, args.ip_remote), shell=True)
+    password = ''
+    rc = call("sshpass -p '{}' sshfs -o allow_other,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 {}@{}:/ ./remotes/{}".format(password, args.user_remote, args.ip_remote, args.ip_remote), shell=True)
     if rc != 0:
       print("Unable to mount {} filesystem through SSH with user {}".format(args.ip_remote, args.user_remote))
       sys.exit(1)
