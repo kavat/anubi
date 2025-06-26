@@ -55,7 +55,7 @@ class AnubiApi:
     return "Alive"
 
   def _handle_download_signatures(self, data):
-    if init_rules_repo('management') is not None:
+    if init_rules_repo('management', False) is not None:
       return "Download triggered"
     else:
       return "Error during download, check logs"

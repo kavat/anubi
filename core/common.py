@@ -16,6 +16,43 @@ import git
 from sys import platform as _platform
 from datetime import datetime
 
+def mount_sshfs(ip, user, mount_point, password):
+  if not os.path.exists(mount_point):
+    os.makedirs(mount_point)
+
+  cmd = [
+    "sshfs",
+    "-o", "password_stdin",
+    "-o", "reconnect",
+    "-o", "ServerAliveInterval=15",
+    "-o", "ServerAliveCountMax=3",
+    f"{user}@{ip}:/",
+    mount_point
+  ]
+
+  try:
+    result = subprocess.run(cmd, input=password.encode(), capture_output=True, check=True)
+    print("Mounte succeded")
+    return True
+  except subprocess.CalledProcessError as e:
+    print("Error during mount")
+    print(e.stderr.decode())
+    return False
+
+def is_sshfs_mounted(mount_point, check_file=None):
+  try:
+    # Controllo da /proc/mounts
+    with open('/proc/mounts', 'r') as f:
+      for line in f:
+        if mount_point in line and 'fuse.sshfs' in line:
+          # Verifica anche l'accesso se richiesto
+          if check_file:
+            full_path = os.path.join(mount_point, check_file)
+            return os.path.isfile(full_path)
+          return True
+  except Exception as e:
+    print(f"Errore durante il controllo del mount: {e}")
+  return False
 
 def clone_repo(repo_name, dst_path):
   try:
@@ -173,16 +210,19 @@ def get_anubi_conf(type_output):
       s = "{}{} = {}\n".format(s, field, c[field])
     return s
 
-def init_rules_repo(thread_name):
+def init_rules_repo(thread_name, local_rules):
   config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Init rules repo")
   repo = None
-  if os.path.isdir(config.anubi_path['signatures_path']):
-    config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Directory {}, exists, proceeding with pull".format(config.anubi_path['signatures_path']))
-    repo = pull_repo(config.anubi_path['signatures_path'])
+  if local_rules == True:
+    repo = True
   else:
-    repo = clone_repo("https://github.com/kavat/anubi-signatures", config.anubi_path['signatures_path']) 
-  if repo is not None:
-    config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Clone rules repo status: {}".format(repo))
+    if os.path.isdir(config.anubi_path['signatures_path']):
+      config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Directory {}, exists, proceeding with pull".format(config.anubi_path['signatures_path']))
+      repo = pull_repo(config.anubi_path['signatures_path'])
+    else:
+      repo = clone_repo("https://github.com/kavat/anubi-signatures", config.anubi_path['signatures_path']) 
+    if repo is not None:
+      config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Clone rules repo status: {}".format(repo))
   return repo
 
 def current_datetime():
@@ -242,10 +282,10 @@ def check_anubi_struct():
           ritorno = False
   return ritorno
 
-def create_anubi_struct():
+def create_anubi_struct(local_rules):
   if os.path.isdir(config.anubi_path['conf_path']) == False:
     os.mkdir(config.anubi_path['conf_path'], mode=0o755)
-  init_rules_repo('main')
+  init_rules_repo('main', local_rules)
   for dir in config.anubi_path:
     if dir != "configfile_path":
       if os.path.isdir(config.anubi_path[dir]) == False:

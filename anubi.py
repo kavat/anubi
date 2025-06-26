@@ -2,6 +2,7 @@ import sys
 import os
 import config
 import time
+import getpass
 import conf_anubi
 
 from core.anubi_thread import (
@@ -43,7 +44,9 @@ from core.common import (
   check_anubi_struct,
   create_anubi_struct,
   is_root,
-  id_generator
+  id_generator,
+  is_sshfs_mounted,
+  mount_sshfs
 )
 from core.external_interactions import analyze_single_file_or_directory
 
@@ -69,9 +72,11 @@ parser.add_argument('--file', action='store', type=str, help='File to check full
 parser.add_argument('--dir', action='store', type=str, help='Directory to check fullpath')
 parser.add_argument('--ip-remote', action='store', type=str, help='Remote IP to check through SSH')
 parser.add_argument('--user-remote', action='store', type=str, help='User to use for checking IP remote through SSH')
+parser.add_argument('--local-rules', action='store', type=str, help='Load local rules')
+
 args = parser.parse_args()
 
-if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None and args.dir == None and args.ip_remote == False and args.user_remote:
+if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None and args.dir == None and args.ip_remote == False and args.user_remote == False:
   print("Run with argument or -h/--help")
   sys.exit(1)
 
@@ -104,7 +109,7 @@ if args.check_struct == True:
   sys.exit(1)
 
 if args.create_struct == True:
-  create_anubi_struct()
+  create_anubi_struct(args.local_rules)
   sys.exit(1)
 
 if args.wipe == True:
@@ -126,24 +131,29 @@ if args.ip_remote:
     print("Unable to proceed because sshfs or sshpass commands are not found")
     sys.exit(1)
   if args.user_remote:
-    if os.path.exists("./remotes/{}".format(args.ip_remote)) == False:
-      rc = call("mkdir -p ./remotes/{}".format(args.ip_remote), shell=True)
-    password = ''
-    rc = call("sshpass -p '{}' sshfs -o allow_other,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 {}@{}:/ ./remotes/{}".format(password, args.user_remote, args.ip_remote, args.ip_remote), shell=True)
-    if rc != 0:
+    mount_point = "/tmp/remotes/{}".format(args.ip_remote)
+    password = getpass.getpass("Insert password for user {} in system {}: ".format(args.user_remote, args.ip_remote))
+    mount_sshfs(args.ip_remote, args.user_remote, mount_point, password)
+    if is_sshfs_mounted(mount_point) == False:
       print("Unable to mount {} filesystem through SSH with user {}".format(args.ip_remote, args.user_remote))
       sys.exit(1)
-    args.dir = "/remotes/{}".format(args.ip_remote)
+    else:
+      args.dir = mount_point
+      print("{} mounted correctly".format(args.dir))
   else:
     print("Option --user-remote not found, user missed for {}".format(args.ip_remote))
     sys.exit(1)
 
 if args.file or args.dir:
   if args.file:
-    r = analyze_single_file_or_directory(args.file)
+    r = analyze_single_file_or_directory(args.file, args.local_rules)
   if args.dir:
-    r = analyze_single_file_or_directory(args.dir)
+    r = analyze_single_file_or_directory(args.dir, args.local_rules)
   print(r)
+  if args.ip_remote:
+    rc = call("ps xa | grep sshfs | grep \"{}\" | grep -v grep | grep -o \"^[0-9 ]\\\+\" | xargs kill -9 && umount -f {}".format(args.dir.replace("/",'\/'), args.dir), shell=True)
+    if rc != 0:
+      print("Error umounting {}".format(args.dir))
   if r['status'] == True:
     sys.exit(0)
   else:
@@ -152,7 +162,7 @@ if args.file or args.dir:
 if args.start == True or args.start_full == True:
 
   if args.start_full == True:
-    create_anubi_struct()
+    create_anubi_struct(args.local_rules)
 
   if args.start == True and check_anubi_struct() == False:
     print("Something wrong during structure checks, run --create-struct before")
