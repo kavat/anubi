@@ -71,7 +71,7 @@ parser.add_argument('--ip-remote', action='store', type=str, help='Remote IP to 
 parser.add_argument('--user-remote', action='store', type=str, help='User to use for checking IP remote through SSH')
 args = parser.parse_args()
 
-if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None and args.dir == None:
+if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None and args.dir == None and args.ip_remote == False and args.user_remote:
   print("Run with argument or -h/--help")
   sys.exit(1)
 
@@ -126,9 +126,9 @@ if args.ip_remote:
     print("Unable to proceed because sshfs command is not found")
     sys.exit(1)
   if args.user_remote:
-    if os.path.exists("/remotes/{}".format(args.ip_remote)) == False:
-      rc = call("mkdir -p /remotes/{}".format(args.ip_remote), shell=True)
-    rc = call("sshfs -o allow_other,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 {}@{}:/ /remotes/{}".format(args.user_remote, args.ip_remote, args.ip_remote), shell=True)
+    if os.path.exists("./remotes/{}".format(args.ip_remote)) == False:
+      rc = call("mkdir -p ./remotes/{}".format(args.ip_remote), shell=True)
+    rc = call("sshfs -o allow_other,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 {}@{}:/ ./remotes/{}".format(args.user_remote, args.ip_remote, args.ip_remote), shell=True)
     if rc != 0:
       print("Unable to mount {} filesystem through SSH with user {}".format(args.ip_remote, args.user_remote))
       sys.exit(1)
