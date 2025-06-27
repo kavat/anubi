@@ -72,7 +72,7 @@ parser.add_argument('--file', action='store', type=str, help='File to check full
 parser.add_argument('--dir', action='store', type=str, help='Directory to check fullpath')
 parser.add_argument('--ip-remote', action='store', type=str, help='Remote IP to check through SSH')
 parser.add_argument('--user-remote', action='store', type=str, help='User to use for checking IP remote through SSH')
-parser.add_argument('--local-rules', action='store', type=str, help='Load local rules')
+parser.add_argument('--local-rules', action='store_true', help='Load local rules')
 
 args = parser.parse_args()
 

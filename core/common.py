@@ -32,7 +32,7 @@ def mount_sshfs(ip, user, mount_point, password):
 
   try:
     result = subprocess.run(cmd, input=password.encode(), capture_output=True, check=True)
-    print("Mounte succeded")
+    print("Mounted succeded")
     return True
   except subprocess.CalledProcessError as e:
     print("Error during mount")
