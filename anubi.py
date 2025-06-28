@@ -4,7 +4,6 @@ import config
 import time
 import getpass
 import conf_anubi
-import json
 
 from core.anubi_thread import (
   AnubiThread,
