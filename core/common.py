@@ -35,6 +35,8 @@ def mount_sshfs(ip, user, mount_point, password):
     "-o", "reconnect",
     "-o", "ServerAliveInterval=15",
     "-o", "ServerAliveCountMax=3",
+    "-o", "StrictHostKeyChecking=no",
+    "-o", "UserKnownHostsFile=/dev/null",
     f"{user}@{ip}:/",
     mount_point
   ]
