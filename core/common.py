@@ -38,7 +38,7 @@ def print_sbom(sbom):
     versione = comp.get('version', 'N/A')
     tipo = comp.get('type', 'N/A')
     licenze = comp.get('licenses', [])
-    licenza = licenze[0]['license']['name'] if licenze else 'N/A'
+    licenza = licenze[0]['license']['name'] if 'name' in licenze[0]['license'] else 'N/A'
     righe.append([nome, versione, tipo, licenza])
 
   print(tabulate(righe, headers=["Nome", "Versione", "Tipo", "Licenza"], tablefmt="grid"))
