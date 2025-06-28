@@ -1,7 +1,8 @@
 #!/bin/bash
 
 apt update
-apt install -y python3 python3-venv git-core sshfs
+apt install -y python3 python3-venv git-core sshfs curl
+curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 
 cd /opt
 
