@@ -76,6 +76,7 @@ parser.add_argument('--ip-remote', action='store', type=str, help='Remote IP to 
 parser.add_argument('--user-remote', action='store', type=str, help='User to use for checking IP remote through SSH')
 parser.add_argument('--local-rules', action='store_true', help='Load local rules')
 parser.add_argument('--sbom', action='store_true', help='Produce Software Bill Of Material')
+parser.add_argument('--skip', action='store_true', help='Skip Yara and Hash checks when --dir or --file argument is present')
 
 args = parser.parse_args()
 
@@ -124,8 +125,8 @@ if args.start == True and args.start_full == True:
   print("Can not use --start with --start-full, use one")
   sys.exit(1)
 
-if (args.start == True or args.start_full == True) and args.file == True:
-  print("Can not use --start or --start-full with --file, use one")
+if (args.start == True or args.start_full == True) and (args.file == True or args.dir == True):
+  print("Can not use --start or --start-full with --file or --dir, use one")
   sys.exit(1)
 
 if args.ip_remote:
@@ -147,7 +148,7 @@ if args.ip_remote:
     print("Option --user-remote not found, user missed for {}".format(args.ip_remote))
     sys.exit(1)
 
-if args.file or args.dir:
+if (args.file or args.dir) and args.skip == False:
   if args.file:
     r = analyze_single_file_or_directory(args.file, args.local_rules)
   if args.dir:
