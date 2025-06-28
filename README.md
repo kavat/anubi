@@ -72,6 +72,7 @@ External dependencies are needed:
   * Linux (Centos): `yum install sshfs`
 * SYft
   * Linux: `curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin`
+  * MacOS: `brew install syft`
 
 Relating to Pip modules, user can install dependecies through `pip install -r pip_requirements.txt`
 
