@@ -46,7 +46,8 @@ from core.common import (
   is_root,
   id_generator,
   is_sshfs_mounted,
-  mount_sshfs
+  mount_sshfs,
+  build_sbom
 )
 from core.external_interactions import analyze_single_file_or_directory
 
@@ -73,10 +74,11 @@ parser.add_argument('--dir', action='store', type=str, help='Directory to check 
 parser.add_argument('--ip-remote', action='store', type=str, help='Remote IP to check through SSH')
 parser.add_argument('--user-remote', action='store', type=str, help='User to use for checking IP remote through SSH')
 parser.add_argument('--local-rules', action='store_true', help='Load local rules')
+parser.add_argument('--sbom', action='store_true', help='Produce Software Bill Of Material')
 
 args = parser.parse_args()
 
-if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None and args.dir == None and args.ip_remote == False and args.user_remote == False:
+if args.check_conf == False and args.check_struct == False and args.create_struct == False and args.init == False and args.start == False and args.start_full == False and args.wipe == False and args.refresh_yara == False and args.refresh_hash == False and args.refresh_ip == False and args.file == None and args.dir == None and args.ip_remote == False and args.user_remote == False and args.sbom == False:
   print("Run with argument or -h/--help")
   sys.exit(1)
 
@@ -157,6 +159,14 @@ if args.file or args.dir:
   if r['status'] == True:
     sys.exit(0)
   else:
+    sys.exit(1)
+
+if args.sbom == True:
+  if args.dir == True:
+    sbom = build_sbom(mount_path=args.dir)
+    print(sbom)
+  else:
+    print("Cannot produce SBOM without directory argument")
     sys.exit(1)
 
 if args.start == True or args.start_full == True:

@@ -16,6 +16,15 @@ import git
 from sys import platform as _platform
 from datetime import datetime
 
+def build_sbom(mount_path="/mnt/remote_fs", formato="cyclonedx-json"):
+  comando = ["syft", f"dir:{mount_path}", "-o", formato]
+  try:
+    result = subprocess.run(comando, capture_output=True, text=True, check=True)
+    return json.loads(result.stdout)
+  except subprocess.CalledProcessError as e:
+    print("Errore:", e.stderr)
+    return None
+
 def mount_sshfs(ip, user, mount_point, password):
   if not os.path.exists(mount_point):
     os.makedirs(mount_point)
