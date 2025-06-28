@@ -47,7 +47,8 @@ from core.common import (
   id_generator,
   is_sshfs_mounted,
   mount_sshfs,
-  build_sbom
+  build_sbom,
+  print_sbom
 )
 from core.external_interactions import analyze_single_file_or_directory
 
@@ -164,7 +165,7 @@ if args.file or args.dir:
 if args.sbom == True:
   if args.dir == True:
     sbom = build_sbom(mount_path=args.dir)
-    print(sbom)
+    print_sbom(sbom)
   else:
     print("Cannot produce SBOM without directory argument")
     sys.exit(1)

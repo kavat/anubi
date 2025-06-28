@@ -15,6 +15,7 @@ import git
 
 from sys import platform as _platform
 from datetime import datetime
+from tabulate import tabulate
 
 def build_sbom(mount_path="/mnt/remote_fs", formato="cyclonedx-json"):
   comando = ["syft", f"dir:{mount_path}", "-o", formato]
@@ -24,6 +25,22 @@ def build_sbom(mount_path="/mnt/remote_fs", formato="cyclonedx-json"):
   except subprocess.CalledProcessError as e:
     print("Errore:", e.stderr)
     return None
+
+def print_sbom(sbom):
+  if not sbom or 'components' not in sbom:
+    print("No component found in SBOM")
+    return
+
+  righe = []
+  for comp in sbom['components']:
+    nome = comp.get('name', 'N/A')
+    versione = comp.get('version', 'N/A')
+    tipo = comp.get('type', 'N/A')
+    licenze = comp.get('licenses', [])
+    licenza = licenze[0]['license']['name'] if licenze else 'N/A'
+    righe.append([nome, versione, tipo, licenza])
+
+  print(tabulate(righe, headers=["Nome", "Versione", "Tipo", "Licenza"], tablefmt="grid"))
 
 def mount_sshfs(ip, user, mount_point, password):
   if not os.path.exists(mount_point):
