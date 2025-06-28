@@ -164,7 +164,7 @@ if (args.file or args.dir) and args.skip == False:
     sys.exit(1)
 
 if args.sbom == True:
-  if args.dir == True:
+  if args.dir:
     sbom = build_sbom(mount_path=args.dir)
     print_sbom(sbom)
   else:
