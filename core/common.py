@@ -32,16 +32,19 @@ def print_sbom(sbom):
     print("No component found in SBOM")
     return
 
-  righe = []
+  rows = []
   for comp in sbom['components']:
-    nome = comp.get('name', 'N/A')
-    versione = comp.get('version', 'N/A')
-    tipo = comp.get('type', 'N/A')
-    licenze = comp.get('licenses', [])
-    licenza = licenze[0]['license']['name'] if (len(licenze) > 0 and 'license' in licenze[0] and 'name' in licenze[0]['license']) else 'N/A'
-    righe.append([nome, versione, tipo, licenza])
+    if comp['properties']:
+      name = comp['name']
+      type = comp['type']
+      version = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:versionMagic"), 'N/A')
+      description = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:description"), 'N/A')
+      author = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:author"), 'N/A')
+      license = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:license"), 'N/A')
+      path = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:path"), 'N/A')
+      rows.append([name, type, version, description, author, license, path])
 
-  print(tabulate(righe, headers=["Nome", "Versione", "Tipo", "Licenza"], tablefmt="grid"))
+  print(tabulate(rows, headers=["Name", "Type", "Version", "Description", "Author", "License", "Path"], tablefmt="grid"))
 
 def mount_sshfs(ip, user, mount_point, password):
   if not os.path.exists(mount_point):
