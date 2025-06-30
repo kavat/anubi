@@ -46,9 +46,13 @@ def print_sbom(sbom):
       author = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:author"), 'N/A')
       license = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:license"), 'N/A')
       path = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:path"), 'N/A')
-      rows.append([name, type, version, description, author, license, path])
+      if path == 'N/A':
+        path = next((item['value'] for item in comp['properties'] if item["name"] == "syft:location:0:path"), 'N/A')
+      #rows.append([name, type, version, description, author, license, path])
+      rows.append([name, type, version, description, license, path])
       
-  print(tabulate(rows, headers=["Name", "Type", "Version", "Description", "Author", "License", "Path"], tablefmt="grid"))
+  #print(tabulate(rows, headers=["Name", "Type", "Version", "Description", "Author", "License", "Path"], tablefmt="grid"))
+  print(tabulate(rows, headers=["Name", "Type", "Version", "Description", "License", "Path"], tablefmt="grid"))
 
 def mount_sshfs(ip, user, mount_point, password):
   if not os.path.exists(mount_point):
