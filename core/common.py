@@ -38,12 +38,16 @@ def print_sbom(sbom):
       name = comp['name']
       type = comp['type']
       version = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:versionMagic"), 'N/A')
+      if version == 'N/A' and 'version' in comp:
+        version = comp['version']
       description = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:description"), 'N/A')
+      if description == 'N/A' and 'description' in comp:
+        description = comp['description']
       author = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:author"), 'N/A')
       license = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:license"), 'N/A')
       path = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:path"), 'N/A')
       rows.append([name, type, version, description, author, license, path])
-
+      
   print(tabulate(rows, headers=["Name", "Type", "Version", "Description", "Author", "License", "Path"], tablefmt="grid"))
 
 def mount_sshfs(ip, user, mount_point, password):
