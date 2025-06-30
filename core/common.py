@@ -34,7 +34,7 @@ def print_sbom(sbom):
 
   rows = []
   for comp in sbom['components']:
-    if comp['properties']:
+    if 'properties' in comp:
       name = comp['name']
       type = comp['type']
       version = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:versionMagic"), 'N/A')
