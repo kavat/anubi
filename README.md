@@ -55,8 +55,8 @@ External dependencies are needed:
   * MacOS: `brew install git`
   * Windows: follow [official documentation](https://git-scm.com/download/win)
 * Python3
-  * Linux (Debian): `apt install python3`
-  * Linux (Centos): `yum install python3`
+  * Linux (Debian): `apt install python3 python3-dev`
+  * Linux (Centos): `yum install python3 python3-dev`
   * MacOS: `brew install python3`
   * Windows: follow [official documentation](https://www.python.org/downloads/windows/)
 * Python3 Pip
