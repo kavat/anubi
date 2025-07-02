@@ -79,7 +79,7 @@ parser.add_argument('--user-remote', action='store', type=str, help='User to use
 parser.add_argument('--local-rules', action='store_true', help='Load local rules')
 parser.add_argument('--export-html', action='store_true', help='Export output in HTML format')
 parser.add_argument('--sbom', action='store_true', help='Produce Software Bill Of Material')
-parser.add_argument('--skip', action='store_true', help='Skip Yara and Hash checks when --dir or --file argument is present')
+parser.add_argument('--noscan', action='store_true', help='Skip Yara and Hash checks when --dir or --file argument is present')
 
 args = parser.parse_args()
 
@@ -151,7 +151,7 @@ if args.ip_remote:
     print("Option --user-remote not found, user missed for {}".format(args.ip_remote))
     sys.exit(1)
 
-if (args.file or args.dir) and args.skip == False:
+if (args.file or args.dir) and args.noscan == False:
   if args.file:
     r = analyze_single_file_or_directory(args.file, args.local_rules)
   if args.dir:
