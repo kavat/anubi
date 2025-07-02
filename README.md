@@ -12,6 +12,7 @@ Anubi combines 5 different engines to check your assets:
 3. IP check
 4. Filesystem modifications (Voyeur)
 5. API
+6. SBOM (Software bill of materials)
 
 These functionalities use a prepared set of rules available in [my repository](https://github.com/kavat/anubi-signatures) generated daily; even custom rules can be loaded.
 
@@ -41,6 +42,10 @@ Command to connect with API system `curl http://127.0.0.1:5555/api?func=help` pr
 User is helped by a simply webui in order to interact with Anubi (as default console is reacheable at http://127.0.0.1:5555)
 
 ![Anubu WebUI](images/webui.png)
+
+### SBOM
+Anubi helps producing SBOM (Software Bill of Materials), a comprehensive, machine-readable inventory of all components, including their versions and dependencies, used in a software application.
+Using syft command, SBOM is provided with OWASP CycloneDX standard.
 
 ## OS supported
 Linux, MacOS and Windows
@@ -103,15 +108,21 @@ In details, options available are the following:
 *  --dir DIR                  Directory to check fullpath
 *  --ip-remote IP_REMOTE      Remote IP to check through SSH
 *  --user-remote USER_REMOTE  User to use for checking IP remote through SSH
+*  --local-rules         Load local rules
+*  --export-html         Export output in HTML format
+*  --sbom                Produce Software Bill Of Material
+*  --noscan              Skip Yara and Hash checks when --dir or --file argument is present
 
 Remember to run always as **root** user!
+
+## Run standard agent mode with periodic scan
 
 In order to start and control our assets, follow the flow below:
 * clone repo
 * install dependencies
 * run Anubi with --start-full
 
-During first time start Anubi will ask for its internal set up, as:
+During its first time start Anubi will ask for its internal set up, as:
 * periodic IOC/malware scan
 * live network activities monitoring
 * particular directories hooks where IOC and malware detections will started on file creation/modification events.
@@ -119,6 +130,10 @@ During first time start Anubi will ask for its internal set up, as:
 ![Anubu init](images/anubi_init.png)
 
 In case of error during rules loading process, only the line with error will be discarded, not the entire file.
+
+## Run one-shot agent
+
+If no --start or --start-full arguments are set, agent can ben run with the others options and finishes its lifecicle at the end of the execution
 
 ## conf_anubi.py
 File conf_anubi.py contains personal settings usable by user to customize Anubi, as below:
