@@ -185,21 +185,16 @@ def file_exclusions(file_path):
     if get_platform() == "linux" or get_platform() == "macos":
       for exclusion in conf_anubi.linux_dir_exclusions:
         if file_path.startswith(exclusion) == True:
-          print("1")
           return True
     if file_path.startswith(config.application_path):
-      print("2")
       return True
     file_extension = re.search('\.[^\/\.]+$', file_path)
     if file_extension:
       if file_extension.group(0) in conf_anubi.extension_exclusions:
-        print("3")
         return True
     if os.path.getsize(file_path) > conf_anubi.max_file_size:
-      print("4")
       return True
     return False
-  print("5")
   return True
 
 def loop_until_input(message, accepted):
