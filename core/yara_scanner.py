@@ -79,10 +79,13 @@ class YaraScanner:
         return self.compiled_rules.match(file_path)
       else:
         config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Error accessing {}: {}".format(file_path, check_file_access["msg"]))
-    except yara.Error as e:
-      config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Yara.Error exception on {}: {}".format(file_path, e))
+    except RuntimeWarning as e:
+      config.loggers["resources"]["logger_anubi_yara"].get_logger().error("RuntimeWarning exception on {}: {}".format(file_path, e))
       pass
-    except UnicodeEncodeError as ee:
+    except yara.Error as ee:
+      config.loggers["resources"]["logger_anubi_yara"].get_logger().error("Yara.Error exception on {}: {}".format(file_path, ee))
+      pass
+    except UnicodeEncodeError as eee:
       pass
     return []
 
