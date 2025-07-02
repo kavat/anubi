@@ -48,9 +48,11 @@ from core.common import (
   is_sshfs_mounted,
   mount_sshfs,
   build_sbom,
+  parse_sbom,
   print_sbom
 )
 from core.external_interactions import analyze_single_file_or_directory
+from core.export import export_html
 
 from core.msgbox import MsgBox
 from argparse import ArgumentParser
@@ -75,6 +77,7 @@ parser.add_argument('--dir', action='store', type=str, help='Directory to check 
 parser.add_argument('--ip-remote', action='store', type=str, help='Remote IP to check through SSH')
 parser.add_argument('--user-remote', action='store', type=str, help='User to use for checking IP remote through SSH')
 parser.add_argument('--local-rules', action='store_true', help='Load local rules')
+parser.add_argument('--export-html', action='store_true', help='Export output in HTML format')
 parser.add_argument('--sbom', action='store_true', help='Produce Software Bill Of Material')
 parser.add_argument('--skip', action='store_true', help='Skip Yara and Hash checks when --dir or --file argument is present')
 
@@ -159,14 +162,20 @@ if (args.file or args.dir) and args.skip == False:
     if rc != 0:
       print("Error umounting {}".format(args.dir))
   if r['status'] == True:
-    sys.exit(0)
+    if args.export_html:
+      export_html(r, 'rules')
+    if args.sbom != True:
+      sys.exit(0)
   else:
     sys.exit(1)
 
 if args.sbom == True:
   if args.dir:
     sbom = build_sbom(mount_path=args.dir)
-    print_sbom(sbom)
+    parsed_sbom = parse_sbom(sbom)
+    print_sbom(parsed_sbom)
+    if args.export_html and len(parsed_sbom) > 0:
+      export_html(parsed_sbom, 'sbom')
   else:
     print("Cannot produce SBOM without directory argument")
     sys.exit(1)

@@ -1,0 +1,48 @@
+<html>
+  <head><title>Anubi rules HTML report</title></head>
+  <body>
+    {% if data['yara_scan']|length > 0 %}
+    <h1>YARA rules</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>File detect</th>
+          <th>Rule</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data['yara_scan'] %}
+        <tr>
+          <td></td>
+          <td>{{ item['file_path'] }}</td>
+          <td>{{ item['rule'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <br>
+    {% endif %}
+    {% if data['hash_scan']|length > 0 %}
+    <h1>HASH rules</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>File detect</th>
+          <th>Rule</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data['hash_scan'] %}
+        <tr>
+          <td></td>
+          <td>{{ item['file_path'] }}</td>
+          <td>{{ item['rule'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </body>
+</html>

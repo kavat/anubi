@@ -27,10 +27,10 @@ def build_sbom(mount_path="/mnt/remote_fs", formato="cyclonedx-json"):
     print("Errore:", e.stderr)
     return None
 
-def print_sbom(sbom):
+def parse_sbom(sbom):
   if not sbom or 'components' not in sbom:
     print("No component found in SBOM")
-    return
+    return []
 
   rows = []
   for comp in sbom['components']:
@@ -48,11 +48,12 @@ def print_sbom(sbom):
       path = next((item['value'] for item in comp['properties'] if item["name"] == "syft:metadata:path"), 'N/A')
       if path == 'N/A':
         path = next((item['value'] for item in comp['properties'] if item["name"] == "syft:location:0:path"), 'N/A')
-      #rows.append([name, type, version, description, author, license, path])
       rows.append([name, type, version, description, license, path])
-      
-  #print(tabulate(rows, headers=["Name", "Type", "Version", "Description", "Author", "License", "Path"], tablefmt="grid"))
-  print(tabulate(rows, headers=["Name", "Type", "Version", "Description", "License", "Path"], tablefmt="grid"))
+
+  return rows
+
+def print_sbom(parsed_sbom):
+  print(tabulate(parsed_sbom, headers=["Name", "Type", "Version", "Description", "License", "Path"], tablefmt="grid"))
 
 def mount_sshfs(ip, user, mount_point, password):
   if not os.path.exists(mount_point):
@@ -102,14 +103,40 @@ def clone_repo(repo_name, dst_path):
     return None
 
 def pull_repo(dst_path):
+  if not os.path.isdir(dst_path):
+    print(f"Directory {dst_path} not found")
+    return None
+
   try:
     repo = git.Repo(dst_path)
-    o = repo.remotes.origin
-    o.pull()
+
+    if repo.bare:
+      print(f"Bare repository not found in {dst_path}, pull not performed")
+      return None
+
+    repo.git.checkout('main')
+
+    if repo.is_dirty(untracked_files=True):
+      print("Stashing local modifications")
+      repo.git.stash('save')
+
+    output = repo.git.pull()
+    print(f"Pull completed:\n{output}")
+
+    stash_list = repo.git.stash('list')
+    if stash_list:
+      repo.git.stash('pop')
+
     return repo
+
+  except git.exc.InvalidGitRepositoryError:
+    print(f"{dst_path} is not a valid Git repository")
+  except git.exc.GitCommandError as e:
+    print(f"Error executing command Git: {e}")
   except Exception as e:
-    config.loggers["resources"]["logger_anubi_main"].get_logger().critical("Unable to pull git rules repo: {}".format(e))
-    return None
+    print(f"Generic error: {e}")
+
+  return None
 
 def wait_for_updating(action):
   if action == 'yara':
@@ -158,16 +185,21 @@ def file_exclusions(file_path):
     if get_platform() == "linux" or get_platform() == "macos":
       for exclusion in conf_anubi.linux_dir_exclusions:
         if file_path.startswith(exclusion) == True:
+          print("1")
           return True
     if file_path.startswith(config.application_path):
+      print("2")
       return True
     file_extension = re.search('\.[^\/\.]+$', file_path)
     if file_extension:
       if file_extension.group(0) in conf_anubi.extension_exclusions:
+        print("3")
         return True
     if os.path.getsize(file_path) > conf_anubi.max_file_size:
+      print("4")
       return True
     return False
+  print("5")
   return True
 
 def loop_until_input(message, accepted):
@@ -259,10 +291,12 @@ def init_rules_repo(thread_name, local_rules):
     if os.path.isdir(config.anubi_path['signatures_path']):
       config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Directory {}, exists, proceeding with pull".format(config.anubi_path['signatures_path']))
       repo = pull_repo(config.anubi_path['signatures_path'])
+      if repo is not None:
+        config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Pull rules repo status: {}".format(repo))
     else:
       repo = clone_repo("https://github.com/kavat/anubi-signatures", config.anubi_path['signatures_path']) 
-    if repo is not None:
-      config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Clone rules repo status: {}".format(repo))
+      if repo is not None:
+        config.loggers["resources"]["logger_anubi_" + thread_name].get_logger().info("Clone rules repo status: {}".format(repo))
   return repo
 
 def current_datetime():

@@ -26,7 +26,7 @@ voyeur_win_dirs_nowild = []
 max_file_size = 52428800
 
 # YARA RULES WHITELIST
-yara_whitelist = ["SurtrStrings", "Surtr"]
+yara_whitelist = ["powershell", "Misc_Suspicious_Strings", "SurtrStrings", "Surtr"]
 
 # HASH WHITELIST
 hash_whitelist = []

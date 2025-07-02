@@ -97,7 +97,7 @@ class HashScanner:
     return ""
 
 def hash_scan_file(hash_scanner, file_path, func_orig, report_filename):
-  found = 0
+  found = {}
   try:
     if file_exclusions(file_path) == False:
       matches = hash_scanner.check(file_path)
@@ -105,7 +105,7 @@ def hash_scan_file(hash_scanner, file_path, func_orig, report_filename):
         config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Malware {} matched for {}".format(matches, file_path))
         write_report(report_filename, "Malware {} matched for {}".format(matches, file_path))
         write_stats(func_orig, "Malware {} matched for {}".format(matches, file_path))
-        found = 1
+        found = {'file_path':file_path,'rule':matches}
       else:
         config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
         #write_report(report_filename, "{} cleaned".format(file_path))
@@ -117,12 +117,12 @@ def hash_scan_file(hash_scanner, file_path, func_orig, report_filename):
   return found
 
 def hash_scan_single_file(hash_scanner, file_path, func_orig):
-  found = ""
+  found = {}
   try:
     matches = hash_scanner.check(file_path)
     if matches != "":
       config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Malware {} matched for {}".format(matches, file_path))
-      found = matches
+      found = {'file_path':file_path,'rule':matches}
     else:
       config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
   except FileNotFoundError:
@@ -133,14 +133,13 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
   config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Check for updating status")
   wait_for_updating('hash')
   config.hash_scan.set(True)
-  found = 0
+  found = []
   try:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Hash scan started")
 
     for file_path in file_paths:
 
       if os.path.isdir(file_path):
-
         for root, dirs, files in os.walk(file_path, topdown=True):
           new_dirs = []
           for d in dirs:
@@ -157,22 +156,27 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
           for file in files:
             if file_exclusions(f"{Path(root) / file}") == False:
               try:
-                found = found + hash_scan_file(hash_scanner, f"{Path(root) / file}", 'hash', report_filename)
+                found_ = hash_scan_file(hash_scanner, f"{Path(root) / file}", 'hash', report_filename)
+                if found_ != {}:
+                  found.append(found_)
               except FileNotFoundError:
                 pass
 
-        if os.path.isfile(file_path) and file_exclusions(file_path) == False:
-          try:
-            found = found + hash_scan_file(hash_scanner, file_path, 'hash', report_filename)
-          except FileNotFoundError:
-            pass
+      if os.path.isfile(file_path) and file_exclusions(file_path) == False:
+        try:
+          found_ = hash_scan_file(hash_scanner, file_path, 'hash', report_filename)
+          if found_ != {}:
+            found.append(found_)
+        except FileNotFoundError:
+          pass
+    
   except Exception as e:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during start_hash_scanner")
     config.loggers["resources"]["logger_anubi_hash"].get_logger().exception(e, traceback.format_exc())
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("start_hash_scanner() BOOM!!!")
   config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Hash scan finished")
   config.hash_scan.set(False)
-  if found > 0:
+  if len(found) > 0:
     config.msgbox[id_generator(10)] = {"title": "Periodic Hash scan", "msg": "Malware detected, please check reports or logs"}
   return found
 

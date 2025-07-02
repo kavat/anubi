@@ -87,17 +87,22 @@ class YaraScanner:
     return []
 
 def yara_scan_file(yara_scanner, file_path, func_orig, report_filename):
-  found_ = 0
+  found_ = []
   try:
     if file_exclusions(file_path) == False:
       matches = yara_scanner.check(file_path)
       if matches != []:
         for found in matches:
           if str(found) not in conf_anubi.yara_whitelist:
-            config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
+            try:
+              description = found.meta.description
+              config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {} ({})".format(found, file_path, description))
+            except:
+              description = ""
+              config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
             write_report(report_filename, "Rule {} matched for {}".format(found, file_path))
             write_stats(func_orig, "Rule {} matched for {}".format(found, file_path))
-            found_ = 1
+            found_.append({'file_path':file_path,'rule':found,'description':description})
           else:
             config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("Rule {} matched for {} but whitelisted".format(found, file_path))
             #write_report(report_filename, "Rule {} matched for {} but whitelisted".format(found, file_path))
@@ -117,8 +122,13 @@ def yara_scan_single_file(yara_scanner, file_path, func_orig):
     matches = yara_scanner.check(file_path)
     if matches != []:
       for found in matches:
-        config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
-        found_.append(found)
+        try:
+          description = found.meta.description
+          config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {} ({})".format(found, file_path, description))
+        except:
+          description = ""
+          config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {}".format(found, file_path))
+        found_.append({'file_path':file_path,'rule':found,'description':description})
     else:
       config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().info("{} cleaned".format(file_path))
   except FileNotFoundError:
@@ -129,7 +139,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
   config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Check for updating status")
   wait_for_updating('yara')
   config.yara_scan.set(True)
-  found = 0
+  found = []
   try:
     config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Yara scan started")
     for file_path in file_paths:
@@ -153,7 +163,8 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
               try:
                 #print(f"Esamino {Path(root) / file}")
                 status_yara = yara_scan_file(yara_scanner, f"{Path(root) / file}", 'yara', report_filename)
-                found = found + status_yara
+                for sy in status_yara:
+                  found.append(sy)
               except FileNotFoundError:
                 pass
 
@@ -161,7 +172,8 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
         try:
           #print(f"Esamino {filepath}")
           status_yara = yara_scan_file(yara_scanner, file_path, 'yara', report_filename)
-          found = found + status_yara
+          for sy in status_yara:
+            found.append(sy)
         except FileNotFoundError:
           pass
 
@@ -171,7 +183,7 @@ def start_yara_scanner(yara_scanner, file_paths, report_filename):
     config.loggers["resources"]["logger_anubi_master_exceptions"].get_logger().critical("start_yara_scanner() BOOM!!!")
   config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Yara scan finished")
   config.yara_scan.set(False)
-  if found > 0:
+  if len(found) > 0:
     config.msgbox[id_generator(10)] = {"title": "Periodic Yara scan", "msg": "IOC detected, please check reports or logs"}
   return found
 

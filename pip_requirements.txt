@@ -7,3 +7,4 @@ py-notifier==0.5.0
 gitpython
 psutil
 tabulate
+jinja2
