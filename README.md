@@ -79,7 +79,7 @@ External dependencies are needed:
   * Linux: `curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin`
   * MacOS: `brew install syft`
 
-Relating to Pip modules, user can install dependecies through `pip install -r pip_requirements.txt`
+Relating to Pip modules, user can install dependecies through `pip3 install -r pip_requirements.txt`
 
 **Attention**: running Anubu some errors can appear, as below
 `yara.SyntaxError: ......./anubi/conf/anubi-signatures/yara/RANSOM_BadRabbit.yar(35): invalid field name "imphash"`
