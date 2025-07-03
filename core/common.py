@@ -63,6 +63,7 @@ def mount_sshfs(ip, user, mount_point, password):
     "sshfs",
     "-o", "password_stdin",
     "-o", "reconnect",
+    "-o", "allow_other",
     "-o", "ServerAliveInterval=15",
     "-o", "ServerAliveCountMax=3",
     "-o", "StrictHostKeyChecking=no",
