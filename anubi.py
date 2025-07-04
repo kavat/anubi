@@ -133,9 +133,9 @@ if (args.start == True or args.start_full == True) and (args.file == True or arg
   sys.exit(1)
 
 if args.ip_remote:
-  result = call("which sshfs && which sshpass", shell=True)
+  result = call("which sshfs", shell=True)
   if result > 0:
-    print("Unable to proceed because sshfs or sshpass commands are not found")
+    print("Unable to proceed because sshfs has not been found")
     sys.exit(1)
   if args.user_remote:
     mount_point = "/tmp/remotes/{}".format(args.ip_remote)
