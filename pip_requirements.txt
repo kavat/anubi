@@ -1,5 +1,5 @@
 Flask
-psutil==5.9.0
+psutil==6.1.1
 scapy
 watchdog==4.0.1
 yara-python
