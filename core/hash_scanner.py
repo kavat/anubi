@@ -117,12 +117,12 @@ def hash_scan_file(hash_scanner, file_path, func_orig, report_filename):
   return found
 
 def hash_scan_single_file(hash_scanner, file_path, func_orig):
-  found = {}
+  found = []
   try:
     matches = hash_scanner.check(file_path)
     if matches != "":
       config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Malware {} matched for {}".format(matches, file_path))
-      found = {'file_path':file_path,'rule':matches}
+      found.append({'file_path':file_path,'rule':matches})
     else:
       config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().debug("{} cleaned".format(file_path))
   except FileNotFoundError:
