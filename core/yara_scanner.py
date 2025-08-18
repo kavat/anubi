@@ -98,7 +98,7 @@ def yara_scan_file(yara_scanner, file_path, func_orig, report_filename):
         for found in matches:
           if str(found) not in conf_anubi.yara_whitelist:
             try:
-              description = found.meta.description
+              description = found.meta["description"]
               config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {} ({})".format(found, file_path, description))
             except:
               description = ""
@@ -126,7 +126,7 @@ def yara_scan_single_file(yara_scanner, file_path, func_orig):
     if matches != []:
       for found in matches:
         try:
-          description = found.meta.description
+          description = found.meta["description"]
           config.loggers["resources"]["logger_anubi_" + func_orig].get_logger().critical("Rule {} matched for {} ({})".format(found, file_path, description))
         except:
           description = ""
