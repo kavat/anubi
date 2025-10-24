@@ -147,8 +147,12 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
             try:
               _ = list(os.scandir(full_path))  # Tenta accesso per verificare permessi
               new_dirs.append(d)
+            except OSError:
+              print(f"OSError: {full_path}")
+              pass
             except PermissionError:
               print(f"Permission denied: {full_path}")
+              pass
             except FileNotFoundError:
               pass
           dirs[:] = new_dirs  # Modifica dirs in-place per evitare discesa
@@ -169,7 +173,6 @@ def start_hash_scanner(hash_scanner, file_paths, report_filename):
             found.append(found_)
         except FileNotFoundError:
           pass
-    
   except Exception as e:
     config.loggers["resources"]["logger_anubi_hash"].get_logger().critical("Error during start_hash_scanner")
     config.loggers["resources"]["logger_anubi_hash"].get_logger().exception(e, traceback.format_exc())
