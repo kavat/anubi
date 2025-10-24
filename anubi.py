@@ -80,6 +80,8 @@ parser.add_argument('--local-rules', action='store_true', help='Load local rules
 parser.add_argument('--export-html', action='store_true', help='Export output in HTML format')
 parser.add_argument('--sbom', action='store_true', help='Produce Software Bill Of Material')
 parser.add_argument('--noscan', action='store_true', help='Skip Yara and Hash checks when --dir or --file argument is present')
+parser.add_argument('--yara', action='store_true', help='Force single Yara scan one shot')
+parser.add_argument('--hash', action='store_true', help='Force single Hash scan one shot')
 
 args = parser.parse_args()
 
@@ -179,6 +181,16 @@ if args.sbom == True:
   else:
     print("Cannot produce SBOM without directory argument")
     sys.exit(1)
+
+if args.yara == True:
+  report_filename = "{}/{}_{}.report".format(config.anubi_path['report_path'], conf_anubi.yara_report_suffix, id_generator(10))
+  config.loggers["resources"]["logger_anubi_yara"].get_logger().info("Forced yara_scan, waiting to start")
+  start_yara_scanner(YaraScanner(), ["/"], report_filename)  
+
+if args.hash == True:
+  report_filename = "{}/{}_{}.report".format(config.anubi_path['report_path'], conf_anubi.hash_report_suffix, id_generator(10))
+  config.loggers["resources"]["logger_anubi_hash"].get_logger().info("Forced hash_scan, waiting to start")
+  start_hash_scanner(HashScanner(), ["/"], report_filename)
 
 if args.start == True or args.start_full == True:
 
